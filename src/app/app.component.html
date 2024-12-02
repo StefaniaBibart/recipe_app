@@ -1,0 +1,10 @@
+<app-header></app-header>
+    <div class="main-content">
+      <app-sidebar [class.hidden]="sidebarHidden()"></app-sidebar>
+      <button (click)="toggleSidebar()" class="sidebar-toggle" [class.collapsed]="sidebarHidden()">
+        {{ sidebarHidden() ? '>' : '<' }}
+      </button>
+      <div class="recipe-card-container">
+        <app-recipe-card></app-recipe-card>
+      </div>
+    </div>

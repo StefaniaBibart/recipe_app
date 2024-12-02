@@ -1,0 +1,25 @@
+<div class="recipe-card" *ngIf="currentRecipe() as recipe; else noRecipe">
+  <h2>{{ recipe.name }}</h2>
+  <div class="recipe-content">
+    <div class="ingredients">
+      <h3>Ingredients:</h3>
+      <ul>
+        <li *ngFor="let ingredient of recipe.ingredients">{{ ingredient }}</li>
+      </ul>
+    </div>
+    <div class="instructions">
+      <h3>Instructions:</h3>
+      <p>{{ recipe.instructions }}</p>
+    </div>
+  </div>
+  <div class="navigation">
+    <button (click)="previousRecipe()">Previous</button>
+    <button (click)="nextRecipe()">Next</button>
+  </div>
+</div>
+<ng-template #noRecipe>
+  <div class="recipe-card no-recipe" *ngIf="recipeService.noRecipesFound()">
+    <h2>No Recipes Found</h2>
+    <p>Try adjusting your ingredient selection or add more ingredients.</p>
+  </div>
+</ng-template>
