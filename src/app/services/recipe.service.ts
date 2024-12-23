@@ -1,37 +1,28 @@
 import { Injectable, signal, computed } from '@angular/core';
-
-interface Recipe {
-  name: string;
-  ingredients: string[];
-  instructions: string;
-}
+import { RecipeDataService } from './recipe-data.service';
+import { Recipe } from '../recipe.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
-  private allRecipes = signal<Recipe[]>([
-    {
-      name: 'Pasta Carbonara',
-      ingredients: ['spaghetti', 'eggs', 'bacon', 'parmesan cheese'],
-      instructions: 'Cook pasta, fry bacon, mix eggs and cheese, combine all ingredients.'
-    },
-    {
-      name: 'Chicken Stir Fry',
-      ingredients: ['chicken', 'vegetables', 'soy sauce', 'oil'],
-      instructions: 'Cut chicken and vegetables, stir fry in oil, add soy sauce.'
-    },
-    {
-      name: 'Vegetable Soup',
-      ingredients: ['carrots', 'celery', 'onions', 'vegetable broth'],
-      instructions: 'Chop vegetables, sauté in pot, add broth, simmer until vegetables are tender.'
-    }
-  ]);
+  private allRecipes = signal<Recipe[]>([]);
 
   private filteredRecipes = signal<Recipe[]>([]);
   private currentIndex = signal(0);
 
   ingredients = signal<string[]>([]);
+
+  constructor(private recipeDataService: RecipeDataService) {
+    this.loadRecipes();
+  }
+
+  private loadRecipes() {
+    this.recipeDataService.getRecipesFromJson().subscribe({
+      next: (recipes) => this.allRecipes.update(() => recipes),
+      error: (err) => console.error('Error loading recipes:', err),
+    });
+  }
 
   currentRecipe = computed(() => {
     const recipes = this.filteredRecipes().length > 0 ? this.filteredRecipes() : this.allRecipes();

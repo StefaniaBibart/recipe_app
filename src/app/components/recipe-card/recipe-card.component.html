@@ -17,6 +17,7 @@
     <button (click)="nextRecipe()">Next</button>
   </div>
 </div>
+<!-- doesn't work -->
 <ng-template #noRecipe>
   <div class="recipe-card no-recipe" *ngIf="recipeService.noRecipesFound()">
     <h2>No Recipes Found</h2>
