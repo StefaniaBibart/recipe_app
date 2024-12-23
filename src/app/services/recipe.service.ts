@@ -9,9 +9,13 @@ export class RecipeService {
   private allRecipes = signal<Recipe[]>([]);
 
   private filteredRecipes = signal<Recipe[]>([]);
-  private currentIndex = signal(0);
+  currentIndex = signal(0);
+  totalCount = signal(0);
 
   ingredients = signal<string[]>([]);
+
+  searchPerformed = signal(false);
+  isLoading = signal(false);
 
   constructor(private recipeDataService: RecipeDataService) {
     this.loadRecipes();
@@ -19,16 +23,23 @@ export class RecipeService {
 
   private loadRecipes() {
     this.recipeDataService.getRecipesFromJson().subscribe({
-      next: (recipes) => this.allRecipes.update(() => recipes),
-      error: (err) => console.error('Error loading recipes:', err),
+        next: (recipes) => {
+            this.allRecipes.update(() => recipes);
+            this.totalCount.set(recipes.length);
+        },
+        error: (err) => console.error('Error loading recipes:', err),
     });
   }
 
   currentRecipe = computed(() => {
     const recipes = this.filteredRecipes().length > 0 ? this.filteredRecipes() : this.allRecipes();
-    return recipes[this.currentIndex()];
+    return recipes.length > 0 ? recipes[this.currentIndex()] : null;
   });
 
+  noRecipesFound = computed(() => {
+    return this.searchPerformed() && this.filteredRecipes().length === 0 && this.ingredients().length > 0;
+  });
+  
   addIngredient(ingredient: string) {
     this.ingredients.update(ingredients => [...ingredients, ingredient]);
   }
@@ -39,10 +50,12 @@ export class RecipeService {
 
   searchRecipes() {
     this.isLoading.set(true);
+    this.searchPerformed.set(true);
     setTimeout(() => {
       const searchIngredients = this.ingredients();
       if (searchIngredients.length === 0) {
         this.filteredRecipes.set([]);
+        this.totalCount.set(0);
       } else {
         const filtered = this.allRecipes().filter(recipe =>
           searchIngredients.every(ingredient =>
@@ -50,10 +63,11 @@ export class RecipeService {
           )
         );
         this.filteredRecipes.set(filtered);
+        this.totalCount.set(filtered.length);
       }
       this.currentIndex.set(0);
       this.isLoading.set(false);
-    }, 1000); // Simulate a delay for the search
+    }, 1000);
   }
 
   nextRecipe() {
@@ -65,13 +79,11 @@ export class RecipeService {
     const recipes = this.filteredRecipes().length > 0 ? this.filteredRecipes() : this.allRecipes();
     this.currentIndex.update(index => (index - 1 + recipes.length) % recipes.length);
   }
-
-  isLoading = signal(false);
-  noRecipesFound = computed(() => this.filteredRecipes().length === 0 && this.ingredients().length > 0);
-
+  
   clearSearch() {
     this.ingredients.set([]);
     this.filteredRecipes.set([]);
+    this.totalCount.set(this.allRecipes().length);
     this.currentIndex.set(0);
   }
 }

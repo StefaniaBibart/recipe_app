@@ -10,7 +10,7 @@ import { RecipeService } from '../../services/recipe.service';
 })
 export class RecipeCardComponent {
   public recipeService = inject(RecipeService);
-  currentRecipe = this.recipeService.currentRecipe;
+  // currentRecipe = this.recipeService.currentRecipe();
 
   nextRecipe() {
     this.recipeService.nextRecipe();
