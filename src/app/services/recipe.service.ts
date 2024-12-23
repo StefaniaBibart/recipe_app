@@ -7,13 +7,10 @@ import { Recipe } from '../recipe.model';
 })
 export class RecipeService {
   private allRecipes = signal<Recipe[]>([]);
-
   private filteredRecipes = signal<Recipe[]>([]);
   currentIndex = signal(0);
   totalCount = signal(0);
-
   ingredients = signal<string[]>([]);
-
   searchPerformed = signal(false);
   isLoading = signal(false);
 
@@ -39,6 +36,8 @@ export class RecipeService {
   noRecipesFound = computed(() => {
     return this.searchPerformed() && this.filteredRecipes().length === 0 && this.ingredients().length > 0;
   });
+
+  canSearch = computed(() => this.ingredients().length >= 2);
   
   addIngredient(ingredient: string) {
     this.ingredients.update(ingredients => [...ingredients, ingredient]);

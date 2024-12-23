@@ -1,5 +1,8 @@
 <aside>
   <h2>Add Ingredients</h2>
+  <div *ngIf="recipeService.ingredients().length < 2">
+    <p class="ingredients-warning">You must add at least 2 ingredients to search for recipes.</p>
+  </div>
   <form (ngSubmit)="addIngredient()">
     <input [(ngModel)]="newIngredient" name="ingredient" type="text" placeholder="Enter an ingredient" required>
     <button type="submit">Add</button>
@@ -10,7 +13,7 @@
       <button (click)="removeIngredient(ingredient)" class="remove-btn">×</button>
     </li>
   </ul>
-  <button (click)="searchRecipes()" class="search-btn" [disabled]="recipeService.isLoading()">
+  <button (click)="searchRecipes()" class="search-btn" [disabled]="!recipeService.canSearch() || recipeService.isLoading()">
     {{ recipeService.isLoading() ? 'Searching...' : 'Search Recipes' }}
   </button>
   <button (click)="clearSearch()" class="clear-btn" *ngIf="ingredients().length > 0">
