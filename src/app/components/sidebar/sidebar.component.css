@@ -21,6 +21,13 @@ input {
   border: 1px solid #dbc59b;
   border-radius: 4px;
 }
+/* input.ng-invalid.ng-touched {
+  border: 2px solid #e74c3c; 
+  background-color: #f8d7da; 
+}
+input.ng-valid.ng-touched {
+  border: 2px solid #28a745;
+} */
 .ingredients-warning {
   color: #e74c3c;
   font-size: 14px;
@@ -37,6 +44,12 @@ button {
 }
 button:hover {
   background-color: #a94870;
+}
+button:disabled {
+  background-color: #ccc;
+  color: #888; 
+  cursor: not-allowed; 
+  opacity: 0.6;
 }
 ul {
   list-style-type: none;
@@ -63,12 +76,12 @@ li {
   width: 100%;
   margin-top: 1rem;
 }
-.search-btn:disabled {
+/* .search-btn:disabled {
   background-color: #ccc;
   color: #888; 
   cursor: not-allowed; 
   opacity: 0.6;
-}
+} */
 .clear-btn {
   width: 100%;
   margin-top: 0.5rem;
