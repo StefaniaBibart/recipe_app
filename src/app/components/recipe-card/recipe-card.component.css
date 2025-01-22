@@ -53,3 +53,55 @@ button:hover {
 .no-recipe h2 {
   color: #c25683;
 }
+.recipe-meta {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.category, .area {
+  background-color: #f8e5ee;
+  color: #c25683;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem auto;
+  display: block;
+}
+.ingredients li {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.measure {
+  min-width: 80px;
+  color: #666;
+  font-size: 0.9rem;
+}
+.ingredient-name {
+  flex: 1;
+}
+.instructions-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+.instructions-list li {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+.section-title {
+  font-weight: 600;
+  color: #c25683;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+.section-title:first-child {
+  margin-top: 0;
+}

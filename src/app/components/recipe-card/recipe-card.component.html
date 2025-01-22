@@ -1,15 +1,28 @@
 <div class="recipe-card" *ngIf="!recipeService.noRecipesFound(); else noRecipe">
   <h2>{{ recipeService.currentRecipe()?.name }}</h2>
+  <div class="recipe-meta">
+    <span class="category">{{ recipeService.currentRecipe()?.category }}</span>
+    <span class="area">{{ recipeService.currentRecipe()?.area }}</span>
+  </div>
+  <img [src]="recipeService.currentRecipe()?.image" [alt]="recipeService.currentRecipe()?.name">
   <div class="recipe-content">
     <div class="ingredients">
       <h3>Ingredients:</h3>
       <ul>
-        <li *ngFor="let ingredient of recipeService.currentRecipe()?.ingredients">{{ ingredient }}</li>
+        <li *ngFor="let ingredient of recipeService.currentRecipe()?.ingredients">
+          <span class="measure">{{ ingredient.measure }}</span>
+          <span class="ingredient-name">{{ ingredient.name }}</span>
+        </li>
       </ul>
     </div>
     <div class="instructions">
       <h3>Instructions:</h3>
-      <p>{{ recipeService.currentRecipe()?.instructions }}</p>
+      <ul class="instructions-list">
+        <li *ngFor="let step of formatInstructions(recipeService.currentRecipe()?.instructions || '')"
+    [class.section-title]="step.isTitle">
+  <ng-container *ngIf="step.showNumber">{{ step.stepNumber }}. </ng-container>{{ step.text }}
+</li>
+      </ul>
     </div>
   </div>
   <div class="navigation">

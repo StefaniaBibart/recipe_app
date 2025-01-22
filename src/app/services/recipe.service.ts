@@ -18,14 +18,17 @@ export class RecipeService {
     this.loadRecipes();
   }
 
-  private loadRecipes() {
-    this.recipeDataService.getRecipesFromJson().subscribe({
-        next: (recipes) => {
-            this.allRecipes.update(() => recipes);
-            this.totalCount.set(recipes.length);
-        },
-        error: (err) => console.error('Error loading recipes:', err),
-    });
+  private async loadRecipes() {
+    this.isLoading.set(true);
+    try {
+      await this.recipeDataService.getRecipes();
+      this.allRecipes.set(this.recipeDataService.recipes());
+      this.totalCount.set(this.recipeDataService.recipes().length);
+    } catch (error) {
+      console.error('Error loading recipes:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   currentRecipe = computed(() => {
@@ -40,7 +43,9 @@ export class RecipeService {
   canSearch = computed(() => this.ingredients().length >= 2);
   
   addIngredient(ingredient: string) {
-    this.ingredients.update(ingredients => [...ingredients, ingredient]);
+    if (!this.ingredients().includes(ingredient.toLowerCase())) {
+      this.ingredients.update(ingredients => [...ingredients, ingredient.toLowerCase()]);
+    }
   }
 
   removeIngredient(ingredient: string) {
@@ -57,8 +62,10 @@ export class RecipeService {
         this.totalCount.set(0);
       } else {
         const filtered = this.allRecipes().filter(recipe =>
-          searchIngredients.every(ingredient =>
-            recipe.ingredients.includes(ingredient)
+          searchIngredients.every(searchIngredient =>
+            recipe.ingredients.some(ri => 
+              ri.name.toLowerCase().includes(searchIngredient)
+            )
           )
         );
         this.filteredRecipes.set(filtered);
