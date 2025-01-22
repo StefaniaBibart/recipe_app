@@ -9,3 +9,10 @@ export interface Recipe {
   area: string;
   category: string;
 }
+
+export interface InstructionStep {
+  text: string;
+  showNumber: boolean;
+  isTitle: boolean;
+  stepNumber?: number;
+}

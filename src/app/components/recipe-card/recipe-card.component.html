@@ -4,33 +4,47 @@
     <span class="category">{{ recipeService.currentRecipe()?.category }}</span>
     <span class="area">{{ recipeService.currentRecipe()?.area }}</span>
   </div>
-  <img [src]="recipeService.currentRecipe()?.image" [alt]="recipeService.currentRecipe()?.name">
-  <div class="recipe-content">
-    <div class="ingredients">
-      <h3>Ingredients:</h3>
-      <ul>
-        <li *ngFor="let ingredient of recipeService.currentRecipe()?.ingredients">
-          <span class="measure">{{ ingredient.measure }}</span>
-          <span class="ingredient-name">{{ ingredient.name }}</span>
-        </li>
-      </ul>
-    </div>
-    <div class="instructions">
-      <h3>Instructions:</h3>
-      <ul class="instructions-list">
-        <li *ngFor="let step of formatInstructions(recipeService.currentRecipe()?.instructions || '')"
-    [class.section-title]="step.isTitle">
-  <ng-container *ngIf="step.showNumber">{{ step.stepNumber }}. </ng-container>{{ step.text }}
-</li>
-      </ul>
+
+  <div class="recipe-preview" [class.hidden]="showRecipeDetails()">
+    <img [src]="recipeService.currentRecipe()?.image" [alt]="recipeService.currentRecipe()?.name">
+    <button class="preview-button" (click)="toggleRecipeDetails()">
+      Looks good? Let's cook!
+    </button>
+  </div>
+
+  <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
+    <button class="toggle-view-button" (click)="toggleRecipeDetails()">
+      Show image
+    </button>
+    <div class="recipe-content">
+      <div class="ingredients">
+        <h3>Ingredients:</h3>
+        <ul>
+          <li *ngFor="let ingredient of recipeService.currentRecipe()?.ingredients">
+            <span class="measure">{{ ingredient.measure }}</span>
+            <span class="ingredient-name">{{ ingredient.name }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="instructions">
+        <h3>Instructions:</h3>
+        <ul class="instructions-list">
+          <li *ngFor="let step of formatInstructions(recipeService.currentRecipe()?.instructions || '')"
+              [class.section-title]="step.isTitle">
+            <ng-container *ngIf="step.showNumber">{{ step.stepNumber }}. </ng-container>{{ step.text }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
+
   <div class="navigation">
     <button (click)="previousRecipe()">Previous</button>
     <span>{{ recipeService.currentIndex() + 1 }}/{{ recipeService.totalCount() }}</span>
     <button (click)="nextRecipe()">Next</button>
   </div>
 </div>
+
 <ng-template #noRecipe>
   <div class="recipe-card no-recipe">
     <h2>No Recipes Found</h2>

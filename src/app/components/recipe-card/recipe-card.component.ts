@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeService } from '../../services/recipe.service';
+import { InstructionStep } from '../../recipe.model';
+
 @Component({
   selector: 'app-recipe-card',
   standalone: true,
@@ -10,7 +12,12 @@ import { RecipeService } from '../../services/recipe.service';
 })
 export class RecipeCardComponent {
   public recipeService = inject(RecipeService);
+  showRecipeDetails = signal(false);
   // currentRecipe = this.recipeService.currentRecipe();
+
+  toggleRecipeDetails() {
+    this.showRecipeDetails.update(value => !value);
+  }
 
   nextRecipe() {
     this.recipeService.nextRecipe();
@@ -20,69 +27,66 @@ export class RecipeCardComponent {
     this.recipeService.previousRecipe();
   }
 
-  formatInstructions(instructions: string): { text: string; showNumber: boolean; isTitle: boolean; stepNumber?: number }[] {
-    // First, check if it's a single paragraph without clear steps
-    if (!instructions.includes('Step') && 
-        !instructions.match(/\d+[\.\)]/) && 
-        !instructions.includes('\n')) {
-      return [{ text: instructions, showNumber: false, isTitle: false }];
+  private isSingleParagraph(instructions: string): boolean {
+    return !instructions.includes('Step') && 
+           !instructions.match(/\d+[\.\)]/) && 
+           !instructions.includes('\n');
+  }
+
+  private cleanInstructionsText(text: string): string {
+    return text
+      .replace(/STEP\s*\d+[\s:\.]*/gi, '')
+      .replace(/\d+\.\d+\./g, '')
+      .replace(/\d+\./g, '');
+  }
+
+  private createStep(text: string, showNumber: boolean, isTitle: boolean, stepNumber?: number): InstructionStep {
+    return { text, showNumber, isTitle, stepNumber };
+  }
+
+  private processStepWithTitle(step: string, stepCounter: number): { steps: InstructionStep[], newCounter: number } {
+    const titleColonMatch = step.match(/^([A-Z\s]+):(.+)/);
+    const steps: InstructionStep[] = [];
+    let counter = stepCounter;
+
+    if (titleColonMatch) {
+      steps.push(this.createStep(titleColonMatch[1], false, true));
+      
+      if (titleColonMatch[2].trim()) {
+        counter++;
+        steps.push(this.createStep(titleColonMatch[2].trim(), true, false, counter));
+      }
+    } else {
+      const isFullTitle = /^[A-Z\s]+$/.test(step);
+      if (isFullTitle) {
+        steps.push(this.createStep(step, false, true));
+      } else {
+        counter++;
+        steps.push(this.createStep(step, true, false, counter));
+      }
     }
 
-    // Remove "STEP X" prefixes and clean up the text
-    let cleanText = instructions
-      .replace(/STEP\s*\d+[\s:\.]*/gi, '')
-      .replace(/\d+\.\d+\./g, '')  // Remove X.X. format
-      .replace(/\d+\./g, '');      // Remove X. format
+    return { steps, newCounter: counter };
+  }
 
-    // Split into steps
-    let steps = cleanText
+  formatInstructions(instructions: string): InstructionStep[] {
+    if (this.isSingleParagraph(instructions)) {
+      return [this.createStep(instructions, false, false)];
+    }
+
+    const cleanText = this.cleanInstructionsText(instructions);
+    const steps = cleanText
       .split(/\n+/)
       .map(step => step.trim())
       .filter(step => step.length > 0);
 
-    // Process steps and identify titles
-    let formattedSteps: { text: string; showNumber: boolean; isTitle: boolean; stepNumber?: number }[] = [];
+    let formattedSteps: InstructionStep[] = [];
     let stepCounter = 0;
-    
+
     steps.forEach(step => {
-      // Split step if it contains a title with colon
-      const titleColonMatch = step.match(/^([A-Z\s]+):(.+)/);
-      if (titleColonMatch) {
-        // Add the title part
-        formattedSteps.push({
-          text: titleColonMatch[1],
-          showNumber: false,
-          isTitle: true
-        });
-        // Add the instruction part if it exists
-        if (titleColonMatch[2].trim()) {
-          stepCounter++;
-          formattedSteps.push({
-            text: titleColonMatch[2].trim(),
-            showNumber: true,
-            isTitle: false,
-            stepNumber: stepCounter
-          });
-        }
-      } else {
-        // Check if the entire step is in uppercase
-        const isFullTitle = /^[A-Z\s]+$/.test(step);
-        if (isFullTitle) {
-          formattedSteps.push({
-            text: step,
-            showNumber: false,
-            isTitle: true
-          });
-        } else {
-          stepCounter++;
-          formattedSteps.push({
-            text: step,
-            showNumber: steps.length > 1,
-            isTitle: false,
-            stepNumber: stepCounter
-          });
-        }
-      }
+      const { steps: processedSteps, newCounter } = this.processStepWithTitle(step, stepCounter);
+      formattedSteps = [...formattedSteps, ...processedSteps];
+      stepCounter = newCounter;
     });
 
     return formattedSteps;

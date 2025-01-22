@@ -69,8 +69,9 @@ button:hover {
 }
 img {
   width: 100%;
-  max-width: 400px;
-  height: auto;
+  max-width: 300px;
+  height: 200px;
+  object-fit: cover;
   border-radius: 8px;
   margin: 1rem auto;
   display: block;
@@ -104,4 +105,49 @@ img {
 }
 .section-title:first-child {
   margin-top: 0;
+}
+.recipe-preview {
+  text-align: center;
+  position: relative;
+  margin-bottom: 2rem;
+}
+.preview-button {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+  background-color: #c25683;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.preview-button:hover {
+  background-color: #a94870;
+}
+.toggle-view-button {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #f8e5ee;
+  color: #c25683;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.toggle-view-button:hover {
+  background-color: #f5d5e5;
+}
+.hidden {
+  display: none;
+}
+.recipe-details {
+  animation: fadeIn 0.3s ease-in;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
