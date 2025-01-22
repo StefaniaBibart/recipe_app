@@ -31,10 +31,19 @@ export class RecipeService {
     }
   }
 
-  currentRecipe = computed(() => {
+  currentRecipe() {
     const recipes = this.filteredRecipes().length > 0 ? this.filteredRecipes() : this.allRecipes();
-    return recipes.length > 0 ? recipes[this.currentIndex()] : null;
-  });
+    if (recipes.length === 0) return null;
+    
+    const recipe = recipes[this.currentIndex()];
+    return {
+      ...recipe,
+      ingredients: recipe.ingredients.map(ing => ({
+        ...ing,
+        measure: this.normalizeFraction(ing.measure)
+      }))
+    };
+  }
 
   noRecipesFound = computed(() => {
     return this.searchPerformed() && this.filteredRecipes().length === 0 && this.ingredients().length > 0;
@@ -91,6 +100,24 @@ export class RecipeService {
     this.filteredRecipes.set([]);
     this.totalCount.set(this.allRecipes().length);
     this.currentIndex.set(0);
+  }
+
+  private normalizeFraction(measure: string): string {
+    const fractionMap: { [key: string]: string } = {
+      '1/2': '½',
+      '1/3': '⅓',
+      '2/3': '⅔',
+      '1/4': '¼',
+      '3/4': '¾',
+      '1/8': '⅛',
+      '3/8': '⅜',
+      '5/8': '⅝',
+      '7/8': '⅞'
+    };
+
+    return measure.replace(/(\d+)\/(\d+)/g, (match) => {
+      return fractionMap[match] || match;
+    });
   }
 }
 

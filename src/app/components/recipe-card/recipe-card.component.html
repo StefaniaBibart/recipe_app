@@ -1,4 +1,9 @@
 <div class="recipe-card" *ngIf="!recipeService.noRecipesFound(); else noRecipe">
+  <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
+    <button class="toggle-view-button" (click)="toggleRecipeDetails()">
+      <img [src]="recipeService.currentRecipe()?.image" [alt]="recipeService.currentRecipe()?.name">
+    </button>
+  </div>
   <h2>{{ recipeService.currentRecipe()?.name }}</h2>
   <div class="recipe-meta">
     <span class="category">{{ recipeService.currentRecipe()?.category }}</span>
@@ -13,9 +18,6 @@
   </div>
 
   <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
-    <button class="toggle-view-button" (click)="toggleRecipeDetails()">
-      Show image
-    </button>
     <div class="recipe-content">
       <div class="ingredients">
         <h3>Ingredients:</h3>
