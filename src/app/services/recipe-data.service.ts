@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Recipe } from '../recipe.model';
+import { Recipe } from '../models/recipe.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +20,13 @@ export class RecipeDataService {
     }
   }
 
-  async getRecipes(): Promise<void> {
-    if (this.recipes().length > 0) {
+  async getRecipes(forceRefresh = false): Promise<void> {
+    if (this.recipes().length > 0 && !forceRefresh) {
       return;
+    }
+
+    if (forceRefresh) {
+      this.clearCache();
     }
 
     try {
@@ -32,6 +36,10 @@ export class RecipeDataService {
       }
       
       const data = await response.json();
+      if (!data.meals) {
+        throw new Error('No recipes found in API response');
+      }
+
       const recipes: Recipe[] = data.meals.map((meal: any) => {
         const ingredients: { name: string; measure: string }[] = [];
         
@@ -48,6 +56,7 @@ export class RecipeDataService {
         }
 
         return {
+          id: meal.idMeal,
           name: meal.strMeal,
           instructions: meal.strInstructions,
           ingredients: ingredients,
@@ -63,5 +72,10 @@ export class RecipeDataService {
       console.error('Error fetching recipes:', error);
       throw error;
     }
+  }
+
+  clearCache() {
+    localStorage.removeItem(this.localStorageKey);
+    this.recipes.set([]);
   }
 }

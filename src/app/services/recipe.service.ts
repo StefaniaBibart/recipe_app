@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { RecipeDataService } from './recipe-data.service';
-import { Recipe } from '../recipe.model';
+import { Recipe } from '../models/recipe.model';
+import { DataStorageService } from './data-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,21 @@ export class RecipeService {
   ingredients = signal<string[]>([]);
   searchPerformed = signal(false);
   isLoading = signal(false);
+  private favorites = signal<{ [key: string]: Recipe }>({});
+  private lastRefreshTime = signal<number>(Date.now());
+  private readonly REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-  constructor(private recipeDataService: RecipeDataService) {
+  constructor(
+    private recipeDataService: RecipeDataService,
+    private dataStorageService: DataStorageService
+  ) {
     this.loadRecipes();
+    this.loadFavorites();
+    this.checkAndRefreshIfNeeded();
   }
 
   private async loadRecipes() {
+    await this.checkAndRefreshIfNeeded();
     this.isLoading.set(true);
     try {
       await this.recipeDataService.getRecipes();
@@ -28,6 +38,15 @@ export class RecipeService {
       console.error('Error loading recipes:', error);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  private loadFavorites() {
+    const favoritesObs = this.dataStorageService.fetchFavorites();
+    if (favoritesObs) {
+      favoritesObs.subscribe(favorites => {
+        this.favorites.set(favorites);
+      });
     }
   }
 
@@ -59,6 +78,17 @@ export class RecipeService {
 
   removeIngredient(ingredient: string) {
     this.ingredients.update(ingredients => ingredients.filter(i => i !== ingredient));
+    
+    // If less than 2 ingredients left, show all recipes
+    if (this.ingredients().length < 2) {
+      this.filteredRecipes.set([]);
+      this.totalCount.set(this.allRecipes().length);
+      this.currentIndex.set(0);
+      this.searchPerformed.set(false);
+    } else {
+      // Re-run search with remaining ingredients if we still have 2 or more
+      this.searchRecipes();
+    }
   }
 
   searchRecipes() {
@@ -84,7 +114,6 @@ export class RecipeService {
       this.isLoading.set(false);
     }, 1000);
   }
-
   nextRecipe() {
     const recipes = this.filteredRecipes().length > 0 ? this.filteredRecipes() : this.allRecipes();
     this.currentIndex.update(index => (index + 1) % recipes.length);
@@ -96,6 +125,7 @@ export class RecipeService {
   }
   
   clearSearch() {
+    this.checkAndRefreshIfNeeded();
     this.ingredients.set([]);
     this.filteredRecipes.set([]);
     this.totalCount.set(this.allRecipes().length);
@@ -118,6 +148,69 @@ export class RecipeService {
     return measure.replace(/(\d+)\/(\d+)/g, (match) => {
       return fractionMap[match] || match;
     });
+  }
+
+  setFavorites(favorites: { [key: string]: Recipe }) {
+    this.favorites.set(favorites);
+  }
+
+  toggleFavorite(recipe: Recipe) {
+    if (this.isFavorite(recipe.id)) {
+      const removeObs = this.dataStorageService.removeFavoriteRecipe(recipe.id);
+      if (removeObs) {
+        removeObs.subscribe(() => {
+          this.favorites.update(favs => {
+            const newFavs = { ...favs };
+            delete newFavs[recipe.id];
+            return newFavs;
+          });
+        });
+      }
+    } else {
+      const storeObs = this.dataStorageService.storeFavoriteRecipe(recipe);
+      if (storeObs) {
+        storeObs.subscribe(() => {
+          this.favorites.update(favs => ({
+            ...favs,
+            [recipe.id]: recipe
+          }));
+        });
+      }
+    }
+  }
+
+  isFavorite(recipeId: string): boolean {
+    return !!this.favorites()[recipeId];
+  }
+
+  getFavorites() {
+    return this.favorites();
+  }
+
+  async checkAndRefreshIfNeeded() {
+    const now = Date.now();
+    if (now - this.lastRefreshTime() > this.REFRESH_INTERVAL) {
+      await this.refreshRecipes();
+      this.lastRefreshTime.set(now);
+    }
+  }
+
+  async refreshRecipes() {
+    this.isLoading.set(true);
+    try {
+      await this.recipeDataService.clearCache();
+      await this.recipeDataService.getRecipes(true);
+      this.allRecipes.set(this.recipeDataService.recipes());
+      this.totalCount.set(this.recipeDataService.recipes().length);
+      this.currentIndex.set(0);
+      this.filteredRecipes.set([]); // Reset filtered recipes
+      this.ingredients.set([]); // Reset ingredients
+      this.searchPerformed.set(false); // Reset search state
+    } catch (error) {
+      console.error('Error refreshing recipes:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 }
 

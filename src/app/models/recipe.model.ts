@@ -1,4 +1,7 @@
+// TO DO: Remove this file and replace with the one in the models folder
+
 export interface Recipe {
+  id: string;
   name: string;
   instructions: string;
   ingredients: {

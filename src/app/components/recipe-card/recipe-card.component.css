@@ -199,3 +199,22 @@ img {
     opacity: 1;
   }
 }
+.favorite-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #ccc;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  line-height: 1;
+}
+.favorite-btn.favorited {
+  color: #c25683;
+}
+.favorite-btn:hover {
+  transform: scale(0.8);
+}

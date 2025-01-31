@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeService } from '../../services/recipe.service';
-import { InstructionStep } from '../../recipe.model';
+import { AuthService } from '../../services/auth.service';
+import { InstructionStep } from '../../models/recipe.model';
 
 @Component({
   selector: 'app-recipe-card',
@@ -12,8 +13,13 @@ import { InstructionStep } from '../../recipe.model';
 })
 export class RecipeCardComponent {
   public recipeService = inject(RecipeService);
+  private authService = inject(AuthService);
   showRecipeDetails = signal(false);
   // currentRecipe = this.recipeService.currentRecipe();
+
+  isAuthenticated() {
+    return this.authService.user.getValue() !== null;
+  }
 
   toggleRecipeDetails() {
     this.showRecipeDetails.update(value => !value);
@@ -90,5 +96,16 @@ export class RecipeCardComponent {
     });
 
     return formattedSteps;
+  }
+
+  isFavorite() {
+    return this.recipeService.isFavorite(this.recipeService.currentRecipe()?.id || '');
+  }
+
+  toggleFavorite() {
+    const currentRecipe = this.recipeService.currentRecipe();
+    if (currentRecipe) {
+      this.recipeService.toggleFavorite(currentRecipe);
+    }
   }
 }

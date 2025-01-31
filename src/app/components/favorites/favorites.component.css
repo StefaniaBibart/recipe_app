@@ -1,0 +1,10 @@
+.favorites-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h2 {
+    color: #c25683;
+    margin-bottom: 2rem;
+    text-align: center;
+  }

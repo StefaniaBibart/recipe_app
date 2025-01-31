@@ -1,10 +1,17 @@
 <app-header></app-header>
+<main>
+  <ng-container *ngIf="isHomeRoute()">
     <div class="main-content">
       <app-sidebar [class.hidden]="sidebarHidden()"></app-sidebar>
       <button (click)="toggleSidebar()" class="sidebar-toggle" [class.collapsed]="sidebarHidden()">
         {{ sidebarHidden() ? '>' : '<' }}
       </button>
       <div class="recipe-card-container">
-        <app-recipe-card></app-recipe-card>
+        <router-outlet></router-outlet>
       </div>
     </div>
+  </ng-container>
+  <ng-container *ngIf="!isHomeRoute()">
+    <router-outlet></router-outlet>
+  </ng-container>
+</main>

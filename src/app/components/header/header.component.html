@@ -4,9 +4,15 @@
     <div class="dropdown">
       <button class="dropbtn">Menu</button>
       <div class="dropdown-content">
-        <a href="#">Home</a>
-        <a href="#">Favorites</a>
-        <a href="#">About</a>
+        <a routerLink="/">Home</a>
+        <a routerLink="/favorites" *ngIf="isAuthenticated()">Favorites</a>
+        <ng-container *ngIf="!isAuthenticated()">
+          <a routerLink="/auth">Login/Signup</a>
+        </ng-container>
+        <button *ngIf="isAuthenticated()" (click)="onLogout()" class="logout-btn">
+          <span class="logout-text">Logout</span>
+          <span class="logout-icon">⇥</span>
+        </button>
       </div>
     </div>
   </nav>
