@@ -1,53 +1,55 @@
 <div class="recipe-card" *ngIf="!recipeService.noRecipesFound(); else noRecipe">
-  <button 
-    *ngIf="isAuthenticated()"
-    class="favorite-btn" 
-    (click)="toggleFavorite()"
-    [class.favorited]="isFavorite()">
-    ♥
-  </button>
-  <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
-    <button class="toggle-view-button" (click)="toggleRecipeDetails()">
-      <img [src]="recipeService.currentRecipe()?.image" [alt]="recipeService.currentRecipe()?.name">
+  <div class="recipe-header">
+    <button 
+      *ngIf="isAuthenticated()"
+      class="favorite-btn" 
+      (click)="toggleFavorite()"
+      [class.favorited]="isFavorite()">
+      ♥
     </button>
-  </div>
-  <h2>{{ recipeService.currentRecipe()?.name }}</h2>
-  <div class="recipe-meta">
-    <span class="category">{{ recipeService.currentRecipe()?.category }}</span>
-    <span class="area">{{ recipeService.currentRecipe()?.area }}</span>
+    <h2>{{ getCurrentRecipe()?.name }}</h2>
+    <div class="recipe-meta">
+      <span class="category">{{ getCurrentRecipe()?.category }}</span>
+      <span class="area">{{ getCurrentRecipe()?.area }}</span>
+    </div>
   </div>
 
-  <div class="recipe-preview" [class.hidden]="showRecipeDetails()">
-    <img [src]="recipeService.currentRecipe()?.image" [alt]="recipeService.currentRecipe()?.name">
-    <button class="preview-button" (click)="toggleRecipeDetails()">
-      Looks good? Let's cook!
-    </button>
-  </div>
+  <div class="recipe-content-wrapper">
+    <div class="recipe-preview" [class.hidden]="showRecipeDetails()">
+      <img [src]="getCurrentRecipe()?.image" [alt]="getCurrentRecipe()?.name">
+      <button class="preview-button" (click)="toggleRecipeDetails()">
+        Looks good? Let's cook!
+      </button>
+    </div>
 
-  <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
-    <div class="recipe-content">
-      <div class="ingredients">
-        <h3>Ingredients:</h3>
-        <ul>
-          <li *ngFor="let ingredient of recipeService.currentRecipe()?.ingredients">
-            <span class="measure">{{ ingredient.measure }}</span>
-            <span class="ingredient-name">{{ ingredient.name }}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="instructions">
-        <h3>Instructions:</h3>
-        <ul class="instructions-list">
-          <li *ngFor="let step of formatInstructions(recipeService.currentRecipe()?.instructions || '')"
-              [class.section-title]="step.isTitle">
-            <ng-container *ngIf="step.showNumber">{{ step.stepNumber }}. </ng-container>{{ step.text }}
-          </li>
-        </ul>
+    <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
+      <button class="toggle-view-button" (click)="toggleRecipeDetails()">
+        <img [src]="getCurrentRecipe()?.image" [alt]="getCurrentRecipe()?.name">
+      </button>
+      <div class="recipe-content">
+        <div class="ingredients">
+          <h3>Ingredients:</h3>
+          <ul>
+            <li *ngFor="let ingredient of getCurrentRecipe()?.ingredients">
+              <span class="measure">{{ ingredient.measure }}</span>
+              <span class="ingredient-name">{{ ingredient.name }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="instructions">
+          <h3>Instructions:</h3>
+          <ul class="instructions-list">
+            <li *ngFor="let step of formatInstructions(getCurrentRecipe()?.instructions || '')"
+                [class.section-title]="step.isTitle">
+              <ng-container *ngIf="step.showNumber">{{ step.stepNumber }}. </ng-container>{{ step.text }}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="navigation">
+  <div class="navigation" *ngIf="showNavigation">
     <button (click)="previousRecipe()">Previous</button>
     <span>{{ recipeService.currentIndex() + 1 }}/{{ recipeService.totalCount() }}</span>
     <button (click)="nextRecipe()">Next</button>

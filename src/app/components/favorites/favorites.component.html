@@ -1,7 +1,24 @@
 <div class="favorites-container">
-  <h2>My Favorite Recipes</h2>
-  <div class="favorites-grid">
-    <!-- We'll implement this later -->
-    <p>Favorites feature coming soon!</p>
+  <div class="content-wrapper">
+    <div class="favorites-list">
+      <h2>My Favorite Recipes</h2>
+      <div class="favorites-list-content">
+        <div 
+          *ngFor="let recipe of favoriteRecipes()" 
+          class="favorite-item"
+          [class.active]="recipe.id === selectedRecipeId()"
+          (click)="selectRecipe(recipe)">
+          <img [src]="recipe.image" [alt]="recipe.name">
+          <span class="recipe-name">{{ recipe.name }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="recipe-display">
+      <app-recipe-card 
+        *ngIf="selectedRecipeId()"
+        [recipeId]="selectedRecipeId()"
+        [showNavigation]="false">
+      </app-recipe-card>
+    </div>
   </div>
 </div>

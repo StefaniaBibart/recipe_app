@@ -1,8 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, Input, OnChanges, SimpleChanges, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeService } from '../../services/recipe.service';
 import { AuthService } from '../../services/auth.service';
 import { InstructionStep } from '../../models/recipe.model';
+import { Recipe } from '../../models/recipe.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-card',
@@ -11,11 +14,45 @@ import { InstructionStep } from '../../models/recipe.model';
   templateUrl: './recipe-card.component.html',
   styleUrl: './recipe-card.component.css'
 })
-export class RecipeCardComponent {
+export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
   public recipeService = inject(RecipeService);
   private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
   showRecipeDetails = signal(false);
-  // currentRecipe = this.recipeService.currentRecipe();
+  @Input() recipeId: string = '';
+  @Input() showNavigation: boolean = true;
+  selectedRecipe = signal<Recipe | null>(null);
+
+  ngOnInit() {
+    this.recipeService.favorites$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      if (this.recipeId) {
+        const recipe = this.recipeService.getRecipeById(this.recipeId);
+        this.selectedRecipe.set(recipe);
+      }
+    });
+
+    if (this.recipeId) {
+      const recipe = this.recipeService.getRecipeById(this.recipeId);
+      this.selectedRecipe.set(recipe);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['recipeId'] && this.recipeId) {
+      this.selectedRecipe.set(this.recipeService.getRecipeById(this.recipeId));
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  getCurrentRecipe() {
+    return this.recipeId ? this.selectedRecipe() : this.recipeService.currentRecipe();
+  }
 
   isAuthenticated() {
     return this.authService.user.getValue() !== null;
@@ -99,13 +136,14 @@ export class RecipeCardComponent {
   }
 
   isFavorite() {
-    return this.recipeService.isFavorite(this.recipeService.currentRecipe()?.id || '');
+    const recipe = this.getCurrentRecipe();
+    return recipe ? this.recipeService.isFavorite(recipe.id) : false;
   }
 
   toggleFavorite() {
-    const currentRecipe = this.recipeService.currentRecipe();
-    if (currentRecipe) {
-      this.recipeService.toggleFavorite(currentRecipe);
+    const recipe = this.getCurrentRecipe();
+    if (recipe) {
+      this.recipeService.toggleFavorite(recipe);
     }
   }
 }

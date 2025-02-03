@@ -6,7 +6,7 @@
       <button (click)="toggleSidebar()" class="sidebar-toggle" [class.collapsed]="sidebarHidden()">
         {{ sidebarHidden() ? '>' : '<' }}
       </button>
-      <div class="recipe-card-container">
+      <div class="recipe-card-container" [class.sidebar-hidden]="sidebarHidden()">
         <router-outlet></router-outlet>
       </div>
     </div>

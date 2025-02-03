@@ -1,24 +1,47 @@
 .recipe-card {
   position: relative;
-  padding: 2rem;
-  padding-top: 1rem;
   border-radius: 8px;
   background-color: #fdf9fa;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   max-width: 800px;
-  /* width: 100%; */
-  margin: 1rem;
-  margin-top: 3rem;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
 }
+
+.recipe-header {
+  padding: 2rem 2rem 1rem 2rem;
+  background-color: #fdf9fa;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.recipe-content-wrapper {
+  padding: 0 2rem 2rem 2rem;
+}
+
+.recipe-preview {
+  text-align: center;
+  position: relative;
+  padding: 2rem 0;
+}
+
+.recipe-details {
+  position: relative;
+  padding-top: 70px;
+}
+
+.recipe-content {
+  display: flex;
+  gap: 1.5rem;
+}
+
 h2 {
   color: #c25683;
   margin-bottom: 1rem;
   text-align: center;
   font-size: 1.5rem;
-}
-.recipe-content {
-  display: flex;
-  gap: 1.5rem;
 }
 .ingredients {
   flex: 1;
@@ -136,11 +159,6 @@ img {
 .section-title:first-child {
   margin-top: 0;
 }
-.recipe-preview {
-  text-align: center;
-  position: relative;
-  margin-bottom: 2rem;
-}
 .preview-button {
   margin-top: 1rem;
   font-size: 1.2rem;
@@ -157,7 +175,7 @@ img {
 }
 .toggle-view-button {
   position: absolute;
-  top: -70px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
@@ -217,4 +235,22 @@ img {
 }
 .favorite-btn:hover {
   transform: scale(0.8);
+}
+
+.recipe-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.recipe-card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.recipe-card::-webkit-scrollbar-thumb {
+  background: #c25683;
+  border-radius: 4px;
+}
+
+.recipe-card::-webkit-scrollbar-thumb:hover {
+  background: #a94771;
 }
