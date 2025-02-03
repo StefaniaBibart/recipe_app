@@ -12,6 +12,8 @@
     </div>
   </ng-container>
   <ng-container *ngIf="!isHomeRoute()">
-    <router-outlet></router-outlet>
+    <div class="non-home-content">
+      <router-outlet></router-outlet>
+    </div>
   </ng-container>
 </main>

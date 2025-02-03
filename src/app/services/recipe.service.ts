@@ -16,7 +16,7 @@ export class RecipeService {
   isLoading = signal(false);
   private favorites = signal<{ [key: string]: Recipe }>({});
   private lastRefreshTime = signal<number>(Date.now());
-  private readonly REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  private readonly REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
 
   constructor(
     private recipeDataService: RecipeDataService,
