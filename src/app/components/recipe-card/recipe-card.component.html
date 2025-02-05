@@ -7,6 +7,9 @@
       [class.favorited]="isFavorite()">
       ♥
     </button>
+    <button *ngIf="showRecipeDetails()" class="toggle-view-button" (click)="toggleRecipeDetails()">
+      <img [src]="getCurrentRecipe()?.image" [alt]="getCurrentRecipe()?.name">
+    </button>
     <h2>{{ getCurrentRecipe()?.name }}</h2>
     <div class="recipe-meta">
       <span class="category">{{ getCurrentRecipe()?.category }}</span>
@@ -23,9 +26,6 @@
     </div>
 
     <div class="recipe-details" [class.hidden]="!showRecipeDetails()">
-      <button class="toggle-view-button" (click)="toggleRecipeDetails()">
-        <img [src]="getCurrentRecipe()?.image" [alt]="getCurrentRecipe()?.name">
-      </button>
       <div class="recipe-content">
         <div class="ingredients">
           <h3>Ingredients:</h3>
