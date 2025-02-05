@@ -5,6 +5,9 @@
       <button class="dropbtn">Menu</button>
       <div class="dropdown-content">
         <a routerLink="/">Home</a>
+        <a routerLink="/by-ingredients">By Ingredients</a>
+        <a routerLink="/by-area">By Area</a>
+        <a routerLink="/by-category">By Category</a>
         <a routerLink="/favorites" *ngIf="isAuthenticated()">Favorites</a>
         <ng-container *ngIf="!isAuthenticated()">
           <a routerLink="/auth">Login/Signup</a>

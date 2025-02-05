@@ -6,11 +6,14 @@ import { RecipeCardComponent } from './components/recipe-card/recipe-card.compon
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
 import { AuthService } from './services/auth.service';
+import { ByIngredientsComponent } from './components/by-ingredients/by-ingredients.component';
+import { ByAreaComponent } from './components/by-area/by-area.component';
+import { ByCategoryComponent } from './components/by-category/by-category.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent, RecipeCardComponent, SidebarComponent, FavoritesComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, RecipeCardComponent, SidebarComponent, FavoritesComponent, ByIngredientsComponent, ByAreaComponent, ByCategoryComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
