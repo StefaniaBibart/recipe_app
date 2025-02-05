@@ -4,7 +4,7 @@
     <div class="main-content">
       <app-sidebar [class.hidden]="sidebarHidden()"></app-sidebar>
       <button (click)="toggleSidebar()" class="sidebar-toggle" [class.collapsed]="sidebarHidden()">
-        {{ sidebarHidden() ? '>' : '<' }}
+        <span class="toggle-icon">{{ sidebarHidden() ? '›' : '‹' }}</span>
       </button>
       <div class="recipe-card-container" [class.sidebar-hidden]="sidebarHidden()">
         <router-outlet></router-outlet>

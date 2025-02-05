@@ -4,8 +4,26 @@ aside {
   background-color: #fdf9fa;
   height: 100%;
   overflow-y: auto;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  box-shadow: inset -2px 0 5px rgba(194, 86, 131, 0.2);
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
 }
+
+:host {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+}
+
+:host(.hidden) aside {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
 h2 {
   color: #c25683;
   margin-bottom: 1rem;
@@ -72,10 +90,15 @@ li {
   cursor: pointer;
   padding: 0 0.5rem;
 }
+.remove-btn:hover {
+  color: #f1f1f1;
+}
+
 .search-btn {
   width: 100%;
   margin-top: 1rem;
 }
+
 /* .search-btn:disabled {
   background-color: #ccc;
   color: #888; 

@@ -2,7 +2,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1rem;
   background-color: #c25683;
   color: #fdf9fa;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -30,7 +30,7 @@ h1 {
   background-color: #fdf9fa;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   border-radius: 4px;
-  z-index: 1000;
+  z-index: 100;
   min-width: 160px;
   overflow: hidden;
 }
@@ -48,6 +48,7 @@ h1 {
 }
 .dropdown:hover .dropbtn {
   background-color: #a94870;
+  border-radius: 4px;
 }
 .logout-btn {
   width: 100%;
