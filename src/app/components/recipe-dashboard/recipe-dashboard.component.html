@@ -1,0 +1,67 @@
+<div class="dashboard-container">
+  <div class="filters">
+    <div class="filter-group">
+      <div class="select-wrapper">
+        <select [ngModel]="selectedCategory()" (ngModelChange)="updateCategory($event)">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories()" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select [ngModel]="selectedArea()" (ngModelChange)="updateArea($event)">
+          <option value="">All Areas</option>
+          <option *ngFor="let area of areas()" [value]="area">
+            {{ area }}
+          </option>
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <select multiple [ngModel]="selectedIngredients()" 
+                (ngModelChange)="updateIngredients($event)"
+                size="5">
+          <option *ngFor="let ingredient of ingredients()" [value]="ingredient">
+            {{ ingredient }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="active-filters" *ngIf="hasActiveFilters()">
+      <span *ngIf="selectedCategory()">
+        Category: {{ selectedCategory() }}
+        <button (click)="clearCategory()">×</button>
+      </span>
+      <span *ngIf="selectedArea()">
+        Area: {{ selectedArea() }}
+        <button (click)="clearArea()">×</button>
+      </span>
+      <span *ngFor="let ing of selectedIngredients()">
+        Ingredient: {{ ing }}
+        <button (click)="removeIngredient(ing)">×</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="meal-count" *ngIf="filteredRecipes().length > 0">
+    Showing {{ filteredRecipes().length }} {{ filteredRecipes().length === 1 ? 'meal' : 'meals' }}
+  </div>
+  <div class="recipes-grid">
+    <div *ngFor="let recipe of filteredRecipes()" class="recipe-card">
+      <img [src]="recipe.image" [alt]="recipe.name">
+      <div class="recipe-info">
+        <h3>{{ recipe.name }}</h3>
+        <div class="recipe-meta">
+          <span class="category">{{ recipe.category }}</span>
+          <span class="area">{{ recipe.area }}</span>
+        </div>
+        <div class="ingredients-preview">
+          {{ recipe.ingredients.length }} ingredients
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

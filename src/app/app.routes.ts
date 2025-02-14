@@ -6,6 +6,8 @@ import { ByIngredientsComponent } from './components/by-ingredients/by-ingredien
 import { ByAreaComponent } from './components/by-area/by-area.component';
 import { ByCategoryComponent } from './components/by-category/by-category.component';
 import { AuthGuard } from './components/authentication/auth.guard';
+import { DataSyncComponent } from './components/data-sync/data-sync.component';
+import { RecipeDashboardComponent } from './components/recipe-dashboard/recipe-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -18,5 +20,7 @@ export const routes: Routes = [
   },
   { path: 'by-ingredients', component: ByIngredientsComponent },
   { path: 'by-area', component: ByAreaComponent },
-  { path: 'by-category', component: ByCategoryComponent }
+  { path: 'by-category', component: ByCategoryComponent },
+  { path: 'data-sync', component: DataSyncComponent },
+  { path: 'dashboard', component: RecipeDashboardComponent }
 ];

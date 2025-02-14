@@ -1,0 +1,137 @@
+.sync-container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.sync-info {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f8e5ee;
+  border-radius: 4px;
+}
+
+.sync-button {
+  padding: 0.5rem 1rem;
+  background-color: #c25683;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sync-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin-top: 1rem;
+  color: #c25683;
+  padding: 1rem;
+  background-color: #f8e5ee;
+  border-radius: 4px;
+}
+
+.progress-container {
+  margin-top: 1rem;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.sync-section {
+  background-color: #f8e5ee;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.sync-section h3 {
+  margin: 0 0 1rem 0;
+  color: #c25683;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.sub-progress {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+}
+
+.sub-progress .description {
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.progress-bar {
+  height: 20px;
+  background-color: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.progress-bar.main-progress {
+  height: 24px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #c25683;
+  transition: width 0.3s ease;
+}
+
+.data-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.count-item {
+  background-color: #f8e5ee;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.count-item h4 {
+  margin: 0 0 0.5rem 0;
+  color: #c25683;
+}
+
+.count-item p {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #666;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.clear-button {
+  padding: 0.5rem 1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.clear-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+} 

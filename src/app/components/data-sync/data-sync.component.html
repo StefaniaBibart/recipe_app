@@ -1,0 +1,72 @@
+<div class="sync-container">
+  <h2>Data Synchronization</h2>
+  
+  <div class="sync-info">
+    <p>Last sync: {{ lastSyncTime }}</p>
+  </div>
+
+  <div class="data-counts">
+    <div class="count-item">
+      <h4>Categories</h4>
+      <p>{{ dataCounts().categories }}</p>
+    </div>
+    <div class="count-item">
+      <h4>Areas</h4>
+      <p>{{ dataCounts().areas }}</p>
+    </div>
+    <div class="count-item">
+      <h4>Ingredients</h4>
+      <p>{{ dataCounts().ingredients }}</p>
+    </div>
+    <div class="count-item">
+      <h4>Meals</h4>
+      <p>{{ dataCounts().meals }}</p>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button 
+      [disabled]="isSyncing"
+      (click)="startSync()"
+      class="sync-button">
+      {{ isSyncing ? 'Syncing...' : 'Start Sync' }}
+    </button>
+
+    <button 
+      [disabled]="isSyncing"
+      (click)="clearStorage()"
+      class="clear-button">
+      Clear Storage
+    </button>
+  </div>
+
+  <div *ngIf="isSyncing" class="progress-container">
+    <div *ngFor="let operation of progress().operations" class="sync-section">
+      <h3>{{ operation.name }}</h3>
+      <div class="progress-info">
+        <p>{{ operation.current }} / {{ operation.total }}</p>
+      </div>
+      <div class="progress-bar main-progress">
+        <div class="progress-fill" 
+             [style.width.%]="(operation.current / operation.total) * 100">
+        </div>
+      </div>
+
+      <div *ngFor="let subOp of operation.subOperations" class="sub-progress">
+        <p class="description">{{ subOp.name }}</p>
+        <div class="progress-info">
+          <p>{{ subOp.current }} / {{ subOp.total }}</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width.%]="(subOp.current / subOp.total) * 100">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+</div> 
