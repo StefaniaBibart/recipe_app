@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 import { RecipeDataService } from '../../services/recipe-data.service';
+import { MultiselectComponent } from '../multiselect/multiselect.component';
+import { SelectComponent } from '../select/select.component';
+import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
 
 @Component({
   selector: 'app-recipe-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MultiselectComponent, SelectComponent, RecipeCardComponent],
   templateUrl: './recipe-dashboard.component.html',
   styleUrls: ['./recipe-dashboard.component.css']
 })
@@ -20,6 +23,8 @@ export class RecipeDashboardComponent implements OnInit {
   selectedArea = signal<string>('');
   selectedIngredients = signal<string[]>([]);
   searchTerm = signal<string>('');
+  currentPage = signal<number>(1);
+  itemsPerPage = 25;
   
   categories = computed(() => {
     const recipes = this.recipeDataService.recipes();
@@ -52,11 +57,29 @@ export class RecipeDashboardComponent implements OnInit {
     });
   });
 
+  paginatedRecipes = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredRecipes().slice(startIndex, endIndex);
+  });
+
+  totalPages = computed(() => 
+    Math.ceil(this.filteredRecipes().length / this.itemsPerPage)
+  );
+
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
+  });
+
   hasActiveFilters = computed(() => 
     !!this.selectedCategory() || 
     !!this.selectedArea() || 
     this.selectedIngredients().length > 0
   );
+
+  selectedRecipeId = signal<string>('');
+  showModal = signal(false);
 
   ngOnInit() {
     if (!this.recipeService.currentRecipe()) {
@@ -88,5 +111,31 @@ export class RecipeDashboardComponent implements OnInit {
     this.selectedIngredients.update(ingredients => 
       ingredients.filter(i => i !== ingredient)
     );
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(page => page + 1);
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(page => page - 1);
+    }
+  }
+
+  goToPage(page: number) {
+    this.currentPage.set(page);
+  }
+
+  openRecipeDetails(recipe: Recipe) {
+    this.selectedRecipeId.set(recipe.id);
+    this.showModal.set(true);
+  }
+
+  closeModal() {
+    this.showModal.set(false);
+    this.selectedRecipeId.set('');
   }
 } 

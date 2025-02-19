@@ -1,0 +1,137 @@
+.multiselect-container {
+  position: relative;
+  width: 100%;
+}
+
+.selected-options {
+  min-height: 38px;
+  padding: 4px 8px;
+  border: 1px solid #dbc59b;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.selected-tag {
+  background-color: #f8e5ee;
+  color: #c25683;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  color: #c25683;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.dropdown-arrow {
+  color: #c25683;
+  font-size: 0.8rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background-color: white;
+  border: 1px solid #dbc59b;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.search-container {
+  padding: 8px;
+  border-bottom: 1px solid #dbc59b;
+}
+
+.search-container input {
+  width: 95%;
+  padding: 6px;
+  border: 1px solid #dbc59b;
+  border-radius: 4px;
+}
+
+.options-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.option {
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.option:hover {
+  background-color: #f8e5ee;
+}
+
+.option.selected {
+  background-color: #f8e5ee;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #c25683;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkmark {
+  color: #c25683;
+  font-size: 0.8rem;
+}
+
+.placeholder {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.selected-tags.empty {
+  padding: 4px 0;
+}
+
+.options-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.options-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.options-list::-webkit-scrollbar-thumb {
+  background: #c25683;
+  border-radius: 4px;
+}
+
+.options-list::-webkit-scrollbar-thumb:hover {
+  background: #a94771;
+} 

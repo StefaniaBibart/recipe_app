@@ -2,35 +2,33 @@
   <div class="filters">
     <div class="filter-group">
       <div class="select-wrapper">
-        <select [ngModel]="selectedCategory()" (ngModelChange)="updateCategory($event)">
-          <option value="">All Categories</option>
-          <option *ngFor="let category of categories()" [value]="category">
-            {{ category }}
-          </option>
-        </select>
+        <app-select
+          [options]="categories()"
+          [selectedValue]="selectedCategory()"
+          [placeholder]="'Categories'"
+          (selectionChange)="updateCategory($event)"
+        ></app-select>
       </div>
 
       <div class="select-wrapper">
-        <select [ngModel]="selectedArea()" (ngModelChange)="updateArea($event)">
-          <option value="">All Areas</option>
-          <option *ngFor="let area of areas()" [value]="area">
-            {{ area }}
-          </option>
-        </select>
+        <app-select
+          [options]="areas()"
+          [selectedValue]="selectedArea()"
+          [placeholder]="'Areas'"
+          (selectionChange)="updateArea($event)"
+        ></app-select>
       </div>
 
       <div class="select-wrapper">
-        <select multiple [ngModel]="selectedIngredients()" 
-                (ngModelChange)="updateIngredients($event)"
-                size="5">
-          <option *ngFor="let ingredient of ingredients()" [value]="ingredient">
-            {{ ingredient }}
-          </option>
-        </select>
+        <app-multiselect
+          [options]="ingredients()"
+          [selectedValues]="selectedIngredients()"
+          (selectionChange)="updateIngredients($event)"
+        ></app-multiselect>
       </div>
     </div>
 
-    <div class="active-filters" *ngIf="hasActiveFilters()">
+    <!-- <div class="active-filters" *ngIf="hasActiveFilters()">
       <span *ngIf="selectedCategory()">
         Category: {{ selectedCategory() }}
         <button (click)="clearCategory()">×</button>
@@ -43,14 +41,17 @@
         Ingredient: {{ ing }}
         <button (click)="removeIngredient(ing)">×</button>
       </span>
-    </div>
+    </div> -->
   </div>
 
   <div class="meal-count" *ngIf="filteredRecipes().length > 0">
-    Showing {{ filteredRecipes().length }} {{ filteredRecipes().length === 1 ? 'meal' : 'meals' }}
+    Total number of recipes: {{ filteredRecipes().length }}
   </div>
+
   <div class="recipes-grid">
-    <div *ngFor="let recipe of filteredRecipes()" class="recipe-card">
+    <div *ngFor="let recipe of paginatedRecipes()" 
+         class="recipe-card"
+         (click)="openRecipeDetails(recipe)">
       <img [src]="recipe.image" [alt]="recipe.name">
       <div class="recipe-info">
         <h3>{{ recipe.name }}</h3>
@@ -62,6 +63,46 @@
           {{ recipe.ingredients.length }} ingredients
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages() > 1">
+    <button 
+      class="pagination-button" 
+      [disabled]="currentPage() === 1"
+      (click)="previousPage()"
+    >
+      Previous
+    </button>
+    
+    <div class="page-numbers">
+      <button 
+        *ngFor="let page of pageNumbers()"
+        class="page-number"
+        [class.active]="page === currentPage()"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </div>
+
+    <button 
+      class="pagination-button" 
+      [disabled]="currentPage() === totalPages()"
+      (click)="nextPage()"
+    >
+      Next
+    </button>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showModal()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="close-modal" (click)="closeModal()">×</button>
+      <app-recipe-card
+        [recipeId]="selectedRecipeId()"
+        [showNavigation]="false"
+        [isModalView]="true">
+      </app-recipe-card>
     </div>
   </div>
 </div> 

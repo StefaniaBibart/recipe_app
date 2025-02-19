@@ -278,3 +278,22 @@ img {
 .favorite-btn:hover {
   transform: scale(0.8);
 }
+
+.recipe-card.modal-view {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.modal-view .recipe-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.modal-view .recipe-content-wrapper {
+  background: transparent;
+}
+
+.modal-view .recipe-details {
+  padding: 0;
+}

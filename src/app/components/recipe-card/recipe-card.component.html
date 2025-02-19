@@ -1,13 +1,13 @@
-<div class="recipe-card" *ngIf="!recipeService.noRecipesFound(); else noRecipe">
+<div class="recipe-card" [class.modal-view]="isModalView" *ngIf="!recipeService.noRecipesFound(); else noRecipe">
   <div class="recipe-header">
     <button 
-      *ngIf="isAuthenticated()"
+      *ngIf="isAuthenticated() && !isModalView"
       class="favorite-btn" 
       (click)="toggleFavorite()"
       [class.favorited]="isFavorite()">
       ♥
     </button>
-    <button *ngIf="showRecipeDetails()" class="toggle-view-button" (click)="toggleRecipeDetails()">
+    <button *ngIf="showRecipeDetails() && !isModalView" class="toggle-view-button" (click)="toggleRecipeDetails()">
       <img [src]="getCurrentRecipe()?.image" [alt]="getCurrentRecipe()?.name">
     </button>
     <h2>{{ getCurrentRecipe()?.name }}</h2>

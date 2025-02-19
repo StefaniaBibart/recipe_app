@@ -1,0 +1,37 @@
+<div class="multiselect-container" [class.open]="isOpen()">
+  <div class="selected-options" (click)="toggleDropdown()">
+    <div class="selected-tags" [class.empty]="!selectedValues.length">
+      <span *ngFor="let value of selectedValues" class="selected-tag">
+        {{ value }}
+        <button class="remove-tag" (click)="removeOption(value, $event)">×</button>
+      </span>
+      <span class="placeholder" *ngIf="!selectedValues.length">Ingredients</span>
+    </div>
+    <span class="dropdown-arrow">▼</span>
+  </div>
+
+  <div class="dropdown-menu" *ngIf="isOpen()">
+    <div class="search-container">
+      <input
+        type="text"
+        [value]="searchTerm()"
+        (input)="updateSearch($event)"
+        placeholder="Search ingredients..."
+        (click)="$event.stopPropagation()"
+      >
+    </div>
+    <div class="options-list">
+      <div
+        *ngFor="let option of filteredOptions()"
+        class="option"
+        [class.selected]="isSelected(option)"
+        (click)="toggleOption(option)"
+      >
+        <span class="checkbox">
+          <span class="checkmark" *ngIf="isSelected(option)">✓</span>
+        </span>
+        {{ option }}
+      </div>
+    </div>
+  </div>
+</div> 

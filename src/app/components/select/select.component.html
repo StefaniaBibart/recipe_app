@@ -1,0 +1,34 @@
+<div class="select-container" [class.open]="isOpen()">
+  <div class="selected-option" (click)="toggleDropdown()">
+    <div class="selected-text" [class.empty]="!selectedValue">
+      <span *ngIf="selectedValue" class="selected-tag">
+        {{ selectedValue }}
+        <button class="remove-tag" (click)="clearSelection($event)">×</button>
+      </span>
+      <span class="placeholder" *ngIf="!selectedValue">{{ placeholder }}</span>
+    </div>
+    <span class="dropdown-arrow">▼</span>
+  </div>
+
+  <div class="dropdown-menu" *ngIf="isOpen()">
+    <div class="search-container">
+      <input
+        type="text"
+        [value]="searchTerm()"
+        (input)="updateSearch($event)"
+        [placeholder]="'Search ' + placeholder.toLowerCase() + '...'"
+        (click)="$event.stopPropagation()"
+      >
+    </div>
+    <div class="options-list">
+      <div
+        *ngFor="let option of filteredOptions()"
+        class="option"
+        [class.selected]="option === selectedValue"
+        (click)="selectOption(option)"
+      >
+        {{ option }}
+      </div>
+    </div>
+  </div>
+</div> 

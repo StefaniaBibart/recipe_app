@@ -21,9 +21,14 @@ export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
   showRecipeDetails = signal(false);
   @Input() recipeId: string = '';
   @Input() showNavigation: boolean = true;
+  @Input() isModalView: boolean = false;
   selectedRecipe = signal<Recipe | null>(null);
 
   ngOnInit() {
+    if (this.isModalView) {
+      this.showRecipeDetails.set(true);
+    }
+    
     this.recipeService.favorites$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(() => {
