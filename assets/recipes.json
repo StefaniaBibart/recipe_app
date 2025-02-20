@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Pasta Carbonara",
+        "ingredients": ["spaghetti", "eggs", "bacon", "parmesan cheese"],
+        "instructions": "Cook pasta, fry bacon, mix eggs and cheese, combine all ingredients."
+    },
+    {
+        "name": "Chicken Stir Fry",
+        "ingredients": ["chicken", "vegetables", "soy sauce", "oil"],
+        "instructions": "Cut chicken and vegetables, stir fry in oil, add soy sauce."
+    },
+    {
+        "name": "Vegetable Soup",
+        "ingredients": ["carrots", "celery", "onions", "vegetable broth"],
+        "instructions": "Chop vegetables, sauté in pot, add broth, simmer until vegetables are tender."
+    },
+    {
+        "name": "Breakfast Omelette",
+        "ingredients": ["eggs", "vegetables", "cheese", "oil"],
+        "instructions": "Whisk eggs, chop vegetables, cook in oil, add cheese, fold and serve."
+    },
+    {
+        "name": "Bacon and Egg Sandwich",
+        "ingredients": ["bacon", "eggs", "bread", "cheese"],
+        "instructions": "Cook bacon and eggs, assemble sandwich with bread and cheese."
+    },
+    {
+        "name": "Chicken Noodle Soup",
+        "ingredients": ["chicken", "noodles", "carrots", "celery"],
+        "instructions": "Cook chicken, add chopped vegetables and noodles to broth, simmer until tender."
+    },
+    {
+        "name": "Vegetable Stir Fry",
+        "ingredients": ["vegetables", "soy sauce", "oil", "garlic"],
+        "instructions": "Chop vegetables, stir fry in oil with garlic, add soy sauce and mix well."
+    },
+    {
+        "name": "Spaghetti Aglio e Olio",
+        "ingredients": ["spaghetti", "garlic", "oil", "parmesan cheese"],
+        "instructions": "Cook spaghetti, sauté garlic in oil, combine with pasta, and sprinkle with parmesan cheese."
+    },
+    {
+        "name": "Chicken Salad",
+        "ingredients": ["chicken", "vegetables", "oil", "vinegar"],
+        "instructions": "Cook and shred chicken, toss with vegetables, drizzle with oil and vinegar."
+    },
+    {
+        "name": "Egg Drop Soup",
+        "ingredients": ["eggs", "vegetable broth", "soy sauce", "cornstarch"],
+        "instructions": "Heat broth, stir in soy sauce and cornstarch slurry, add whisked eggs while stirring."
+    }
+]
