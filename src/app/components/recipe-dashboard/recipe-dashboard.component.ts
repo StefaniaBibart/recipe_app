@@ -69,7 +69,29 @@ export class RecipeDashboardComponent implements OnInit {
 
   pageNumbers = computed(() => {
     const total = this.totalPages();
-    return Array.from({ length: total }, (_, i) => i + 1);
+    const current = this.currentPage();
+    const pages: number[] = [];
+    
+    // Always add current page
+    pages.push(current);
+    
+    // Add up to 5 previous pages
+    for (let i = 1; i <= 5; i++) {
+      const prevPage = current - i;
+      if (prevPage >= 1) {
+        pages.unshift(prevPage);
+      }
+    }
+    
+    // Add up to 5 next pages
+    for (let i = 1; i <= 5; i++) {
+      const nextPage = current + i;
+      if (nextPage <= total) {
+        pages.push(nextPage);
+      }
+    }
+    
+    return pages;
   });
 
   hasActiveFilters = computed(() => 
