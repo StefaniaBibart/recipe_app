@@ -39,8 +39,9 @@
   <button
     (click)="clearSearch()"
     class="clear-btn"
+    [disabled]="recipeService.isClearingSearch()"
     *ngIf="ingredients().length > 0"
   >
-    Clear Search
+    {{ recipeService.isClearingSearch() ? "Clearing..." : "Clear Search" }}
   </button>
 </aside>
