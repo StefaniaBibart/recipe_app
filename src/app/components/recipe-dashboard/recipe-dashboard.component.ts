@@ -17,7 +17,7 @@ import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
 })
 export class RecipeDashboardComponent implements OnInit {
   private recipeService = inject(RecipeService);
-  private recipeDataService = inject(RecipeDataService);
+  public recipeDataService = inject(RecipeDataService);
   
   selectedCategory = signal<string>('');
   selectedArea = signal<string>('');
@@ -137,5 +137,12 @@ export class RecipeDashboardComponent implements OnInit {
   closeModal() {
     this.showModal.set(false);
     this.selectedRecipeId.set('');
+  }
+
+  resetAllFilters() {
+    this.selectedCategory.set('');
+    this.selectedArea.set('');
+    this.selectedIngredients.set([]);
+    this.currentPage.set(1);
   }
 } 

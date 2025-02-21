@@ -55,4 +55,8 @@ export class RecipeDataService {
     }
     return ingredients;
   }
+
+  hasStoredData(): boolean {
+    return !!localStorage.getItem(this.storageKey);
+  }
 }

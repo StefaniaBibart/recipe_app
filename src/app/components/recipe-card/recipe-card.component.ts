@@ -6,18 +6,23 @@ import { InstructionStep } from '../../models/recipe.model';
 import { Recipe } from '../../models/recipe.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { RecipeDataService } from '../../services/recipe-data.service';
+import { RouterLink } from '@angular/router';
+import { UiService } from '../../services/ui.service';
 
 @Component({
   selector: 'app-recipe-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './recipe-card.component.html',
   styleUrl: './recipe-card.component.css'
 })
 export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
   public recipeService = inject(RecipeService);
+  public recipeDataService = inject(RecipeDataService);
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
+  private uiService = inject(UiService);
   showRecipeDetails = signal(false);
   @Input() recipeId: string = '';
   @Input() showNavigation: boolean = true;
@@ -29,6 +34,10 @@ export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
       this.showRecipeDetails.set(true);
     }
     
+    if (!this.recipeDataService.hasStoredData()) {
+      this.uiService.setSidebarHidden(true);
+    }
+
     this.recipeService.favorites$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(() => {
@@ -150,5 +159,12 @@ export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
     if (recipe) {
       this.recipeService.toggleFavorite(recipe);
     }
+  }
+
+  shouldShowRecipe() {
+    if (this.recipeId) {
+      return true;
+    }
+    return true;
   }
 }

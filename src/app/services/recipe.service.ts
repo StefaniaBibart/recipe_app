@@ -24,6 +24,7 @@ export class RecipeService {
   private favoriteAddedSubject = new Subject<Recipe>();
   favoriteRemoved$ = this.favoriteRemovedSubject.asObservable();
   favoriteAdded$ = this.favoriteAddedSubject.asObservable();
+  isClearingSearch = signal(false);
 
   constructor(
     private recipeDataService: RecipeDataService,
@@ -134,11 +135,16 @@ export class RecipeService {
   }
   
   clearSearch() {
+    this.isClearingSearch.set(true);
     this.checkAndRefreshIfNeeded();
-    this.ingredients.set([]);
-    this.filteredRecipes.set([]);
-    this.totalCount.set(this.allRecipes().length);
-    this.currentIndex.set(0);
+    setTimeout(() => {
+      this.ingredients.set([]);
+      this.filteredRecipes.set([]);
+      this.totalCount.set(this.allRecipes().length);
+      this.currentIndex.set(0);
+      this.searchPerformed.set(false);
+      this.isClearingSearch.set(false);
+    }, 1000);
   }
 
   private normalizeFraction(measure: string): string {

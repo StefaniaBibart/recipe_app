@@ -6,6 +6,7 @@ import { RecipeCardComponent } from './components/recipe-card/recipe-card.compon
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
 import { AuthService } from './services/auth.service';
+import { UiService } from './services/ui.service';
 
 @Component({
   selector: 'app-root',
@@ -16,16 +17,17 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent implements OnInit {
   title = 'recipe-app';
-  sidebarHidden = signal(false);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private uiService = inject(UiService);
+  sidebarHidden = this.uiService.sidebarHidden;
 
   ngOnInit() {
     this.authService.autoLogin();
   }
 
   toggleSidebar() {
-    this.sidebarHidden.update(value => !value);
+    this.uiService.toggleSidebar();
   }
 
   isHomeRoute() {
