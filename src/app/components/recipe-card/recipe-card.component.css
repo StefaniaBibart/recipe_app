@@ -297,3 +297,78 @@ img {
 .modal-view .recipe-details {
   padding: 0;
 }
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f8e5ee;
+  border-top: 5px solid #c25683;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: #c25683;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-recipe a {
+  color: #c25683;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.no-recipe a:hover {
+  text-decoration: underline;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.message-content {
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+.message-content h2 {
+  color: #c25683;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.message-content p {
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.message-content a {
+  color: #c25683;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.message-content a:hover {
+  color: #a94870;
+  text-decoration: underline;
+}

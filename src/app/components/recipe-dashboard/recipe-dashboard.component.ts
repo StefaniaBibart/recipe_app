@@ -17,7 +17,7 @@ import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
 })
 export class RecipeDashboardComponent implements OnInit {
   private recipeService = inject(RecipeService);
-  private recipeDataService = inject(RecipeDataService);
+  public recipeDataService = inject(RecipeDataService);
   
   selectedCategory = signal<string>('');
   selectedArea = signal<string>('');
@@ -69,7 +69,29 @@ export class RecipeDashboardComponent implements OnInit {
 
   pageNumbers = computed(() => {
     const total = this.totalPages();
-    return Array.from({ length: total }, (_, i) => i + 1);
+    const current = this.currentPage();
+    const pages: number[] = [];
+    
+    // Always add current page
+    pages.push(current);
+    
+    // Add up to 5 previous pages
+    for (let i = 1; i <= 5; i++) {
+      const prevPage = current - i;
+      if (prevPage >= 1) {
+        pages.unshift(prevPage);
+      }
+    }
+    
+    // Add up to 5 next pages
+    for (let i = 1; i <= 5; i++) {
+      const nextPage = current + i;
+      if (nextPage <= total) {
+        pages.push(nextPage);
+      }
+    }
+    
+    return pages;
   });
 
   hasActiveFilters = computed(() => 
@@ -137,5 +159,12 @@ export class RecipeDashboardComponent implements OnInit {
   closeModal() {
     this.showModal.set(false);
     this.selectedRecipeId.set('');
+  }
+
+  resetAllFilters() {
+    this.selectedCategory.set('');
+    this.selectedArea.set('');
+    this.selectedIngredients.set([]);
+    this.currentPage.set(1);
   }
 } 

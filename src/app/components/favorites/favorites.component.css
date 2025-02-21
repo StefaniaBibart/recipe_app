@@ -121,3 +121,46 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #a94771;
   }
+
+  .message-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 0 2rem 2rem 2rem;
+    text-align: center;
+  }
+
+  .message-content {
+    background-color: #f8e5ee;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .message-content h2 {
+    color: #c25683;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  .message-content p {
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .message-content a {
+    color: #c25683;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .message-content a:hover {
+    color: #a94870;
+    text-decoration: underline;
+  }
