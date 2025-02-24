@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError, BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment.development';
 
 import { User } from '../models/user.model';
 
@@ -18,6 +19,7 @@ export interface AuthResponseData {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private authKey = environment.FIREBASE_AUTH_KEY;
   user = new BehaviorSubject<User | null>(null);
   private tokenExpirationTimer: any;
 
@@ -26,7 +28,7 @@ export class AuthService {
   signup(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAj4D3Yp7c1Kv9jBimWSw2yVCpOOzAsl2w',
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${this.authKey}`,
         {
           email: email,
           password: password,
@@ -49,7 +51,7 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAj4D3Yp7c1Kv9jBimWSw2yVCpOOzAsl2w',
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${this.authKey}`,
         {
           email: email,
           password: password,
@@ -67,6 +69,7 @@ export class AuthService {
           );
         })
       );
+      console.log(this.authKey);
   }
 
   autoLogin() {
