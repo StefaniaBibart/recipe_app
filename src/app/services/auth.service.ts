@@ -69,7 +69,6 @@ export class AuthService {
           );
         })
       );
-      console.log(this.authKey);
   }
 
   autoLogin() {
