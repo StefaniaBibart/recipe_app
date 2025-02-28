@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, switchMap, take } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Recipe } from '../models/recipe.model';
 
@@ -14,36 +14,41 @@ export class DataStorageService {
   ) {}
 
   storeFavoriteRecipe(recipe: Recipe) {
-    const userId = this.authService.user.getValue()?.id;
-    if (!userId) return;
-
-    return this.http
-      .put(
-        `${this.baseUrl}/favorites/${userId}/${recipe.id}.json`,
-        recipe
-      );
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) throw new Error('User not authenticated');
+        return this.http.put(
+          `${this.baseUrl}/favorites/${user.id}/${recipe.id}.json?auth=${user.token}`,
+          recipe
+        );
+      })
+    );
   }
 
   removeFavoriteRecipe(recipeId: string) {
-    const userId = this.authService.user.getValue()?.id;
-    if (!userId) return;
-
-    return this.http
-      .delete(
-        `${this.baseUrl}/favorites/${userId}/${recipeId}.json`
-      );
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) throw new Error('User not authenticated');
+        return this.http.delete(
+          `${this.baseUrl}/favorites/${user.id}/${recipeId}.json?auth=${user.token}`
+        );
+      })
+    );
   }
 
-  fetchFavorites(): Observable<{ [key: string]: Recipe }> | undefined {
-    const userId = this.authService.user.getValue()?.id;
-    if (!userId) return undefined;
-
-    return this.http
-      .get<{ [key: string]: Recipe }>(
-        `${this.baseUrl}/favorites/${userId}.json`
-      )
-      .pipe(
-        map(recipes => recipes || {})
-      );
+  fetchFavorites(): Observable<{ [key: string]: Recipe }> {
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) throw new Error('User not authenticated');
+        return this.http.get<{ [key: string]: Recipe }>(
+          `${this.baseUrl}/favorites/${user.id}.json?auth=${user.token}`
+        ).pipe(
+          map(recipes => recipes || {})
+        );
+      })
+    );
   }
-} 
+}
