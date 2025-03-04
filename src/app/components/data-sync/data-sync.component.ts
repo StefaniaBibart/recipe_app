@@ -1,6 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataSyncService } from '../../services/data-sync.service';
+import { getDatabase, ref, set } from 'firebase/database';
 
 @Component({
   selector: 'app-data-sync',
@@ -31,7 +32,9 @@ export class DataSyncComponent {
   }
 
   private updateLastSyncTime() {
-    this.lastSyncTime = this.dataSyncService.getTimeSinceLastSync();
+    this.dataSyncService.getTimeSinceLastSync().then(time => {
+      this.lastSyncTime = time;
+    });
   }
 
   async startSync() {
@@ -46,7 +49,10 @@ export class DataSyncComponent {
   async clearStorage() {
     if (confirm('Are you sure you want to clear all stored data? This cannot be undone.')) {
       try {
-        localStorage.clear();
+        const db = getDatabase();
+        const dbRef = ref(db, 'mealdb');
+        await set(dbRef, null);
+        
         this.dataSyncService['updateDataCounts']();
         this.error = '';
         this.lastSyncTime = 'Never synced';

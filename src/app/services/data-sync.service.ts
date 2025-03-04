@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { signal } from '@angular/core';
+import { getDatabase, ref, set, get, child } from 'firebase/database';
 
 interface Category {
   strCategory: string;
@@ -62,12 +63,12 @@ interface DataCounts {
 })
 export class DataSyncService {
   private apiUrl = 'https://www.themealdb.com/api/json/v1/1';
-  private storageKeys = {
-    categories: 'mealdb_categories',
-    areas: 'mealdb_areas',
-    ingredients: 'mealdb_ingredients',
-    meals: 'mealdb_meals',
-    lastSync: 'mealdb_last_sync',
+  private dbPaths = {
+    categories: 'mealdb/categories',
+    areas: 'mealdb/areas',
+    ingredients: 'mealdb/ingredients',
+    meals: 'mealdb/meals',
+    lastSync: 'mealdb/lastSync',
   };
   private progress = signal<SyncProgress>({
     currentOperation: '',
@@ -98,16 +99,13 @@ export class DataSyncService {
       ]);
 
       // Store and update counts
-      localStorage.setItem(
-        this.storageKeys.categories,
-        JSON.stringify(categories)
-      );
-      localStorage.setItem(this.storageKeys.areas, JSON.stringify(areas));
-      localStorage.setItem(
-        this.storageKeys.ingredients,
-        JSON.stringify(ingredients)
-      );
-      this.updateDataCounts();
+      await Promise.all([
+        this.storeDataToFirebase(this.dbPaths.categories, categories),
+        this.storeDataToFirebase(this.dbPaths.areas, areas),
+        this.storeDataToFirebase(this.dbPaths.ingredients, ingredients),
+      ]);
+      
+      await this.updateDataCounts();
 
       // Add categories operation
       this.progress.update((p) => ({
@@ -278,7 +276,7 @@ export class DataSyncService {
         }
       }
 
-      this.updateLastSyncTime();
+      await this.updateLastSyncTime();
     } catch (error) {
       console.error('Error during sync:', error);
       throw error;
@@ -289,33 +287,21 @@ export class DataSyncService {
     const response = await firstValueFrom(
       this.http.get<{ meals: Category[] }>(`${this.apiUrl}/list.php?c=list`)
     );
-    const categories = response.meals;
-    localStorage.setItem(
-      this.storageKeys.categories,
-      JSON.stringify(categories)
-    );
-    return categories;
+    return response.meals;
   }
 
   private async fetchAreas(): Promise<Area[]> {
     const response = await firstValueFrom(
       this.http.get<{ meals: Area[] }>(`${this.apiUrl}/list.php?a=list`)
     );
-    const areas = response.meals;
-    localStorage.setItem(this.storageKeys.areas, JSON.stringify(areas));
-    return areas;
+    return response.meals;
   }
 
   private async fetchIngredients(): Promise<Ingredient[]> {
     const response = await firstValueFrom(
       this.http.get<{ meals: Ingredient[] }>(`${this.apiUrl}/list.php?i=list`)
     );
-    const ingredients = response.meals;
-    localStorage.setItem(
-      this.storageKeys.ingredients,
-      JSON.stringify(ingredients)
-    );
-    return ingredients;
+    return response.meals;
   }
 
   private async fetchMealsByCategory(category: string): Promise<MealPreview[]> {
@@ -355,13 +341,20 @@ export class DataSyncService {
     return response.meals || [];
   }
 
-  private getStoredMeals(): { [key: string]: MealDetail } {
-    const stored = localStorage.getItem(this.storageKeys.meals);
-    return stored ? JSON.parse(stored) : {};
+  private async getStoredMeals(): Promise<{ [key: string]: MealDetail }> {
+    try {
+      const db = getDatabase();
+      const mealsRef = ref(db, this.dbPaths.meals);
+      const snapshot = await get(mealsRef);
+      return snapshot.exists() ? snapshot.val() : {};
+    } catch (error) {
+      console.error('Error getting stored meals:', error);
+      return {};
+    }
   }
 
   private async fetchAndStoreMealDetails(mealId: string): Promise<MealDetail> {
-    const storedMeals = this.getStoredMeals();
+    const storedMeals = await this.getStoredMeals();
 
     // Skip API call if meal already exists
     if (storedMeals[mealId]) {
@@ -385,22 +378,44 @@ export class DataSyncService {
 
     const mealDetail = response.meals[0];
     storedMeals[mealId] = mealDetail;
-    localStorage.setItem(this.storageKeys.meals, JSON.stringify(storedMeals));
-    this.updateDataCounts();
+    
+    // Store the updated meals object
+    await this.storeDataToFirebase(`${this.dbPaths.meals}/${mealId}`, mealDetail);
+    await this.updateDataCounts();
 
     return mealDetail;
   }
 
-  private updateLastSyncTime(): void {
-    localStorage.setItem(this.storageKeys.lastSync, Date.now().toString());
+  private async storeDataToFirebase(path: string, data: any): Promise<void> {
+    try {
+      const db = getDatabase();
+      const dataRef = ref(db, path);
+      await set(dataRef, data);
+    } catch (error) {
+      console.error(`Error storing data to Firebase at ${path}:`, error);
+      throw error;
+    }
   }
 
-  getLastSyncTime(): number {
-    return parseInt(localStorage.getItem(this.storageKeys.lastSync) || '0');
+  private async updateLastSyncTime(): Promise<void> {
+    const timestamp = Date.now();
+    await this.storeDataToFirebase(this.dbPaths.lastSync, timestamp);
   }
 
-  getTimeSinceLastSync(): string {
-    const lastSync = this.getLastSyncTime();
+  async getLastSyncTime(): Promise<number> {
+    try {
+      const db = getDatabase();
+      const syncTimeRef = ref(db, this.dbPaths.lastSync);
+      const snapshot = await get(syncTimeRef);
+      return snapshot.exists() ? snapshot.val() : 0;
+    } catch (error) {
+      console.error('Error getting last sync time:', error);
+      return 0;
+    }
+  }
+
+  async getTimeSinceLastSync(): Promise<string> {
+    const lastSync = await this.getLastSyncTime();
     if (!lastSync) return 'Never synced';
 
     const diff = Date.now() - lastSync;
@@ -446,25 +461,31 @@ export class DataSyncService {
     return this.dataCounts();
   }
 
-  private updateDataCounts() {
-    const categories = JSON.parse(
-      localStorage.getItem(this.storageKeys.categories) || '[]'
-    );
-    const areas = JSON.parse(
-      localStorage.getItem(this.storageKeys.areas) || '[]'
-    );
-    const ingredients = JSON.parse(
-      localStorage.getItem(this.storageKeys.ingredients) || '[]'
-    );
-    const meals = Object.keys(
-      JSON.parse(localStorage.getItem(this.storageKeys.meals) || '{}')
-    ).length;
+  private async updateDataCounts() {
+    try {
+      const db = getDatabase();
+      const dbRef = ref(db);
+      
+      const [categoriesSnapshot, areasSnapshot, ingredientsSnapshot, mealsSnapshot] = await Promise.all([
+        get(child(dbRef, this.dbPaths.categories)),
+        get(child(dbRef, this.dbPaths.areas)),
+        get(child(dbRef, this.dbPaths.ingredients)),
+        get(child(dbRef, this.dbPaths.meals))
+      ]);
+      
+      const categories = categoriesSnapshot.exists() ? categoriesSnapshot.val() : [];
+      const areas = areasSnapshot.exists() ? areasSnapshot.val() : [];
+      const ingredients = ingredientsSnapshot.exists() ? ingredientsSnapshot.val() : [];
+      const meals = mealsSnapshot.exists() ? Object.keys(mealsSnapshot.val()).length : 0;
 
-    this.dataCounts.set({
-      categories: categories.length,
-      areas: areas.length,
-      ingredients: ingredients.length,
-      meals,
-    });
+      this.dataCounts.set({
+        categories: Array.isArray(categories) ? categories.length : 0,
+        areas: Array.isArray(areas) ? areas.length : 0,
+        ingredients: Array.isArray(ingredients) ? ingredients.length : 0,
+        meals,
+      });
+    } catch (error) {
+      console.error('Error updating data counts:', error);
+    }
   }
 }
