@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { Recipe } from '../models/recipe.model';
 
 @Injectable({ providedIn: 'root' })
-export class DataStorageService {
+export class FavoritesService {
   private baseUrl = 'https://recipe-app-44ea7-default-rtdb.europe-west1.firebasedatabase.app';
 
   constructor(
@@ -51,4 +51,4 @@ export class DataStorageService {
       })
     );
   }
-}
+} 

@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { FirebaseDataService } from './firebase-data.service';
 import { Recipe } from '../models/recipe.model';
-import { DataStorageService } from './data-storage.service';
+import { FavoritesService } from './favorites.service';
 import { Subject, BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -28,7 +28,7 @@ export class RecipeService {
 
   constructor(
     private firebaseDataService: FirebaseDataService,
-    private dataStorageService: DataStorageService
+    private favoritesService: FavoritesService
   ) {
     this.loadRecipes();
     this.initializeFavorites();
@@ -50,7 +50,7 @@ export class RecipeService {
   }
 
   private initializeFavorites() {
-    const favoritesObs = this.dataStorageService.fetchFavorites();
+    const favoritesObs = this.favoritesService.fetchFavorites();
     if (favoritesObs) {
       favoritesObs.subscribe({
         next: (favorites) => {
@@ -171,7 +171,7 @@ export class RecipeService {
 
   toggleFavorite(recipe: Recipe) {
     if (this.isFavorite(recipe.id)) {
-      const removeObs = this.dataStorageService.removeFavoriteRecipe(recipe.id);
+      const removeObs = this.favoritesService.removeFavoriteRecipe(recipe.id);
       if (removeObs) {
         removeObs.subscribe(() => {
           const newFavs = { ...this.favorites() };
@@ -182,7 +182,7 @@ export class RecipeService {
         });
       }
     } else {
-      const storeObs = this.dataStorageService.storeFavoriteRecipe(recipe);
+      const storeObs = this.favoritesService.storeFavoriteRecipe(recipe);
       if (storeObs) {
         storeObs.subscribe(() => {
           const newFavs = {
@@ -202,7 +202,7 @@ export class RecipeService {
   }
 
   getFavorites() {
-    return this.dataStorageService.fetchFavorites();
+    return this.favoritesService.fetchFavorites();
   }
 
   async checkAndRefreshIfNeeded() {
