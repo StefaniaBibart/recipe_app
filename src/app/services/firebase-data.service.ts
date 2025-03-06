@@ -5,7 +5,7 @@ import { getDatabase, ref, get } from 'firebase/database';
 @Injectable({
   providedIn: 'root',
 })
-export class RecipeDataService {
+export class FirebaseDataService {
   private dbPath = 'mealdb/meals';
   recipes = signal<Recipe[]>([]);
 

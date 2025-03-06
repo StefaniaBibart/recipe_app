@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { RecipeDataService } from './recipe-data.service';
+import { FirebaseDataService } from './firebase-data.service';
 import { Recipe } from '../models/recipe.model';
 import { DataStorageService } from './data-storage.service';
 import { Subject, BehaviorSubject } from 'rxjs';
@@ -27,7 +27,7 @@ export class RecipeService {
   isClearingSearch = signal(false);
 
   constructor(
-    private recipeDataService: RecipeDataService,
+    private firebaseDataService: FirebaseDataService,
     private dataStorageService: DataStorageService
   ) {
     this.loadRecipes();
@@ -39,9 +39,9 @@ export class RecipeService {
     await this.checkAndRefreshIfNeeded();
     this.isLoading.set(true);
     try {
-      await this.recipeDataService.getRecipes();
-      this.allRecipes.set(this.recipeDataService.recipes());
-      this.totalCount.set(this.recipeDataService.recipes().length);
+      await this.firebaseDataService.getRecipes();
+      this.allRecipes.set(this.firebaseDataService.recipes());
+      this.totalCount.set(this.firebaseDataService.recipes().length);
     } catch (error) {
       console.error('Error loading recipes:', error);
     } finally {
@@ -216,10 +216,10 @@ export class RecipeService {
   async refreshRecipes() {
     this.isLoading.set(true);
     try {
-      await this.recipeDataService.clearCache();
-      await this.recipeDataService.getRecipes(true);
-      this.allRecipes.set(this.recipeDataService.recipes());
-      this.totalCount.set(this.recipeDataService.recipes().length);
+      await this.firebaseDataService.clearCache();
+      await this.firebaseDataService.getRecipes(true);
+      this.allRecipes.set(this.firebaseDataService.recipes());
+      this.totalCount.set(this.firebaseDataService.recipes().length);
       this.currentIndex.set(0);
       this.filteredRecipes.set([]);
       this.ingredients.set([]);

@@ -6,7 +6,7 @@ import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RecipeDataService } from '../../services/recipe-data.service';
+import { FirebaseDataService } from '../../services/firebase-data.service';
 
 @Component({
   selector: 'app-favorites',
@@ -18,7 +18,7 @@ import { RecipeDataService } from '../../services/recipe-data.service';
 export class FavoritesComponent implements OnInit, OnDestroy {
   private recipeService = inject(RecipeService);
   private destroy$ = new Subject<void>();
-  public recipeDataService = inject(RecipeDataService);
+  public firebaseDataService = inject(FirebaseDataService);
   favoriteRecipes = signal<Recipe[]>([]);
   selectedRecipeId = signal<string>('');
   removedRecipeId = signal<string | null>(null);
