@@ -5,7 +5,7 @@
 
 <div class="recipe-card" [class.modal-view]="isModalView">
   <ng-container *ngIf="!recipeService.isLoading()">
-    <ng-container *ngIf="firebaseDataService.hasStoredData(); else noData">
+    <ng-container *ngIf="dataService.hasStoredData(); else noData">
       <ng-container *ngIf="!recipeService.noRecipesFound(); else noRecipe">
         <div class="recipe-header">
           <button 

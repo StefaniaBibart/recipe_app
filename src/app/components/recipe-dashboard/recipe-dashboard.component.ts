@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
-import { FirebaseDataService } from '../../services/firebase-data.service';
+import { DataService } from '../../services/data.service';
 import { MultiselectComponent } from '../multiselect/multiselect.component';
 import { SelectComponent } from '../select/select.component';
 import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
@@ -17,7 +17,7 @@ import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
 })
 export class RecipeDashboardComponent implements OnInit {
   private recipeService = inject(RecipeService);
-  public firebaseDataService = inject(FirebaseDataService);
+  public dataService = inject(DataService);
   
   selectedCategory = signal<string>('');
   selectedArea = signal<string>('');
@@ -27,17 +27,17 @@ export class RecipeDashboardComponent implements OnInit {
   itemsPerPage = 25;
   
   categories = computed(() => {
-    const recipes = this.firebaseDataService.recipes();
+    const recipes = this.dataService.recipes();
     return [...new Set(recipes.map((r: Recipe) => r.category))].sort();
   });
 
   areas = computed(() => {
-    const recipes = this.firebaseDataService.recipes();
+    const recipes = this.dataService.recipes();
     return [...new Set(recipes.map((r: Recipe) => r.area))].sort();
   });
 
   ingredients = computed(() => {
-    const recipes = this.firebaseDataService.recipes();
+    const recipes = this.dataService.recipes();
     const allIngredients = recipes.flatMap(recipe => 
       recipe.ingredients.map(ing => ing.name.toLowerCase())
     );
@@ -45,7 +45,7 @@ export class RecipeDashboardComponent implements OnInit {
   });
 
   filteredRecipes = computed(() => {
-    const recipes = this.firebaseDataService.recipes();
+    const recipes = this.dataService.recipes();
     return recipes.filter((recipe: Recipe) => {
       const categoryMatch = !this.selectedCategory() || recipe.category === this.selectedCategory();
       const areaMatch = !this.selectedArea() || recipe.area === this.selectedArea();

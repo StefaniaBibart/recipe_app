@@ -1,15 +1,14 @@
 import { Injectable, signal } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
 import { getDatabase, ref, get } from 'firebase/database';
+import { DataService } from './data.service';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class FirebaseDataService {
+@Injectable()
+export class FirebaseDataService extends DataService {
   private dbPath = 'mealdb/meals';
-  recipes = signal<Recipe[]>([]);
 
   constructor() {
+    super();
     this.loadRecipesFromFirebase();
   }
 
@@ -45,21 +44,6 @@ export class FirebaseDataService {
     } catch (error) {
       console.error('Error loading recipes from Firebase:', error);
     }
-  }
-
-  private extractIngredients(meal: any): { name: string; measure: string }[] {
-    const ingredients: { name: string; measure: string }[] = [];
-    for (let i = 1; i <= 20; i++) {
-      const ingredient = meal[`strIngredient${i}`];
-      const measure = meal[`strMeasure${i}`];
-      if (ingredient && ingredient.trim() && measure && measure.trim()) {
-        ingredients.push({
-          name: ingredient.trim(),
-          measure: measure.trim()
-        });
-      }
-    }
-    return ingredients;
   }
 
   async hasStoredData(): Promise<boolean> {

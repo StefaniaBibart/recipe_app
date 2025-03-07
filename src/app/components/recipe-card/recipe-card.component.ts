@@ -6,7 +6,7 @@ import { InstructionStep } from '../../models/recipe.model';
 import { Recipe } from '../../models/recipe.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { FirebaseDataService } from '../../services/firebase-data.service';
+import { DataService } from '../../services/data.service';
 import { RouterLink } from '@angular/router';
 import { UiService } from '../../services/ui.service';
 
@@ -19,7 +19,7 @@ import { UiService } from '../../services/ui.service';
 })
 export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
   public recipeService = inject(RecipeService);
-  public firebaseDataService = inject(FirebaseDataService);
+  public dataService = inject(DataService);
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
   private uiService = inject(UiService);
@@ -34,7 +34,7 @@ export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
       this.showRecipeDetails.set(true);
     }
     
-    if (!this.firebaseDataService.hasStoredData()) {
+    if (!this.dataService.hasStoredData()) {
       this.uiService.setSidebarHidden(true);
     }
 
