@@ -22,8 +22,12 @@ export class FavoritesComponent implements OnInit, OnDestroy {
   favoriteRecipes = signal<Recipe[]>([]);
   selectedRecipeId = signal<string>('');
   removedRecipeId = signal<string | null>(null);
+  hasData = signal<boolean>(false);
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Check if data is available
+    this.hasData.set(await this.dataService.hasStoredData());
+    
     this.recipeService.favorites$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(favorites => {

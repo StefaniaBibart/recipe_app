@@ -42,8 +42,17 @@ export class RecipeService {
       await this.dataService.getRecipes();
       this.allRecipes.set(this.dataService.recipes());
       this.totalCount.set(this.dataService.recipes().length);
+      
+      if (this.dataService.recipes().length === 0) {
+        this.filteredRecipes.set([]);
+        this.searchPerformed.set(true);
+      }
     } catch (error) {
       console.error('Error loading recipes:', error);
+      this.allRecipes.set([]);
+      this.filteredRecipes.set([]);
+      this.totalCount.set(0);
+      this.searchPerformed.set(true);
     } finally {
       this.isLoading.set(false);
     }

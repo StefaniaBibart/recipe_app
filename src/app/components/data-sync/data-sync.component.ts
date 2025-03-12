@@ -1,7 +1,6 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataSyncService } from '../../services/data-sync.service';
-import { getDatabase, ref, set } from 'firebase/database';
 
 @Component({
   selector: 'app-data-sync',
@@ -10,7 +9,7 @@ import { getDatabase, ref, set } from 'firebase/database';
   templateUrl: './data-sync.component.html',
   styleUrls: ['./data-sync.component.css']
 })
-export class DataSyncComponent {
+export class DataSyncComponent implements OnInit, OnDestroy {
   private dataSyncService = inject(DataSyncService);
   isSyncing = false;
   error = '';
@@ -22,7 +21,6 @@ export class DataSyncComponent {
   ngOnInit() {
     this.updateLastSyncTime();
     this.intervalId = setInterval(() => this.updateLastSyncTime(), 1000);
-    this.dataSyncService['updateDataCounts']();
   }
 
   ngOnDestroy() {
@@ -40,20 +38,22 @@ export class DataSyncComponent {
   async startSync() {
     this.isSyncing = true;
     this.error = '';
-
-    await this.dataSyncService.syncAll();
-    this.updateLastSyncTime();
-    this.isSyncing = false;
+    
+    try {
+      await this.dataSyncService.syncAll();
+      this.updateLastSyncTime();
+    } catch (err) {
+      this.error = 'Error during sync. Please try again.';
+      console.error(err);
+    } finally {
+      this.isSyncing = false;
+    }
   }
 
   async clearStorage() {
     if (confirm('Are you sure you want to clear all stored data? This cannot be undone.')) {
       try {
-        const db = getDatabase();
-        const dbRef = ref(db, 'mealdb');
-        await set(dbRef, null);
-        
-        this.dataSyncService['updateDataCounts']();
+        await this.dataSyncService.clearStorage();
         this.error = '';
         this.lastSyncTime = 'Never synced';
       } catch (err) {

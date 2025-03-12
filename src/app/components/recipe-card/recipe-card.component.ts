@@ -24,17 +24,21 @@ export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private uiService = inject(UiService);
   showRecipeDetails = signal(false);
+  hasData = signal<boolean>(false);
   @Input() recipeId: string = '';
   @Input() showNavigation: boolean = true;
   @Input() isModalView: boolean = false;
   selectedRecipe = signal<Recipe | null>(null);
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.isModalView) {
       this.showRecipeDetails.set(true);
     }
     
-    if (!this.dataService.hasStoredData()) {
+    // Check if data is available
+    this.hasData.set(await this.dataService.hasStoredData());
+    
+    if (!this.hasData()) {
       this.uiService.setSidebarHidden(true);
     }
 

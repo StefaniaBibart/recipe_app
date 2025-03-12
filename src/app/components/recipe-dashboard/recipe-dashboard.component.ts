@@ -7,11 +7,12 @@ import { DataService } from '../../services/data.service';
 import { MultiselectComponent } from '../multiselect/multiselect.component';
 import { SelectComponent } from '../select/select.component';
 import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-recipe-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, MultiselectComponent, SelectComponent, RecipeCardComponent],
+  imports: [CommonModule, FormsModule, MultiselectComponent, SelectComponent, RecipeCardComponent, RouterLink],
   templateUrl: './recipe-dashboard.component.html',
   styleUrls: ['./recipe-dashboard.component.css']
 })
@@ -25,6 +26,7 @@ export class RecipeDashboardComponent implements OnInit {
   searchTerm = signal<string>('');
   currentPage = signal<number>(1);
   itemsPerPage = 25;
+  hasData = signal<boolean>(false);
   
   categories = computed(() => {
     const recipes = this.dataService.recipes();
@@ -103,7 +105,10 @@ export class RecipeDashboardComponent implements OnInit {
   selectedRecipeId = signal<string>('');
   showModal = signal(false);
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Check if data is available
+    this.hasData.set(await this.dataService.hasStoredData());
+    
     if (!this.recipeService.currentRecipe()) {
       this.recipeService.searchRecipes();
     }

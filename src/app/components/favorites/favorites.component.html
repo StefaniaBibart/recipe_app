@@ -1,5 +1,5 @@
 <div class="favorites-container">
-  <ng-container *ngIf="dataService.hasStoredData(); else noData">
+  <ng-container *ngIf="hasData(); else noData">
     <div class="content-wrapper" *ngIf="favoriteRecipes().length > 0; else noFavorites">
       <div class="favorites-list">
         <h2>My Favorite Recipes</h2>
