@@ -1,27 +1,131 @@
 # RecipeApp
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.12.
+RecipeApp is a comprehensive recipe management application built with Angular that allows users to search for recipes based on ingredients, filter recipes by various criteria, and save their favorite recipes.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Recipe Search
+- **Ingredient-Based Search**: Search for recipes by specifying at least 2 ingredients on the home page
+- **Advanced Filtering**: Filter recipes by area, category, and ingredients on the dashboard page
+- **Recipe Details**: View detailed recipe information including ingredients, measurements, and step-by-step instructions
 
-## Code scaffolding
+### User Management
+- **Authentication**: Sign up and log in using Firebase Authentication
+- **Favorites**: Save and manage your favorite recipes (requires authentication)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Data Management
+- **Dual Storage Options**: Choose between Firebase or LocalStorage as your data provider
+- **Offline Access**: Access your recipes even without an internet connection when using LocalStorage
+- **Data Synchronization**: Sync your favorites between different storage providers
 
-## Build
+## Implementation Details
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Authentication
+- Implemented using Firebase Authentication
+- Secure token-based authentication with automatic token refresh
+- Protected routes using Angular route guards
 
-## Running unit tests
+### Data Storage
+- **API Integration**: Recipes are fetched from [TheMealDB API](https://www.themealdb.com/api.php)
+- **Flexible Storage**: 
+  - Firebase Realtime Database for cloud storage
+  - LocalStorage for offline and browser-based storage
+- **Provider Pattern**: Easily switch between storage providers in app.config.ts
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Deployment
+- Deployed on both [Vercel](https://recipe-app-stefaniambibart-gmailcoms-projects.vercel.app/home) and [GitHub Pages](https://stefaniabibart.github.io/recipe_app/home)
 
-## Running end-to-end tests
+## Setup Instructions
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Prerequisites
+- Node.js (v16 or higher)
+- npm (v7 or higher)
+- Angular CLI (v18 or higher)
+- Firebase account with Realtime Database and Authentication enabled
 
-## Further help
+### Installation
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Install dependencies:
+   ```
+   npm install
+   ```
+
+2. Environment Configuration:
+   - Create a `.env` file in the root directory with the following content:
+   ```
+   FIREBASE_AUTH_KEY=your_firebase_api_key
+   ```
+   - Replace `your_firebase_api_key` with your actual Firebase API key
+
+3. Firebase Configuration:
+   - Update the Firebase configuration in `src/app/app.config.ts`:
+   ```typescript
+   const firebaseConfig = {
+     databaseURL: "your_firebase_database_url",
+    };
+   ```
+
+4. Firebase Database Security Rules:
+   Set up the following security rules in your Firebase Realtime Database:
+   ```json
+   {
+     "rules": {
+       "favorites": {
+         "$userId": {
+           // Only allow read/write if the user is authenticated and accessing their own data
+           ".read": "auth != null && auth.uid == $userId",
+           ".write": "auth != null && auth.uid == $userId",
+           "$recipeId": {
+             // Validate the data structure
+             ".validate": "newData.hasChildren(['id', 'name', 'instructions', 'ingredients', 'image', 'area', 'category'])",
+             "id": {
+               ".validate": "newData.isString()"
+             },
+             "name": {
+               ".validate": "newData.isString()"
+             },
+             "instructions": {
+               ".validate": "newData.isString()"
+             },
+             "ingredients": {
+               ".validate": "newData.hasChildren()"
+             },
+             "image": {
+               ".validate": "newData.isString()"
+             },
+             "area": {
+               ".validate": "newData.isString()"
+             },
+             "category": {
+               ".validate": "newData.isString()"
+             }
+           }
+         }
+       },
+       "mealdb": {
+         // Allow public read/write access to mealdb data
+         ".read": true,
+         ".write": true
+       }
+     }
+   }
+   ```
+
+### Running the Application
+1. Start the development server:
+   ```
+   npm start
+   ```
+   This will load environment variables and start the Angular development server.
+
+2. Navigate to `http://localhost:4200/` in your browser.
+
+### Switching Data Providers
+To change the data provider (Firebase or LocalStorage), modify the provider in `src/app/app.config.ts`:
+
+```typescript
+// Set which data provider to use
+const DATA_PROVIDER = DataProviderType.FIREBASE; // For Firebase
+// OR
+const DATA_PROVIDER = DataProviderType.LOCALSTORAGE; // For LocalStorage
+```

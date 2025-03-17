@@ -6,7 +6,7 @@ import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RecipeDataService } from '../../services/recipe-data.service';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-favorites',
@@ -18,12 +18,16 @@ import { RecipeDataService } from '../../services/recipe-data.service';
 export class FavoritesComponent implements OnInit, OnDestroy {
   private recipeService = inject(RecipeService);
   private destroy$ = new Subject<void>();
-  public recipeDataService = inject(RecipeDataService);
+  public dataService = inject(DataService);
   favoriteRecipes = signal<Recipe[]>([]);
   selectedRecipeId = signal<string>('');
   removedRecipeId = signal<string | null>(null);
+  hasData = signal<boolean>(false);
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Check if data is available
+    this.hasData.set(await this.dataService.hasStoredData());
+    
     this.recipeService.favorites$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(favorites => {
