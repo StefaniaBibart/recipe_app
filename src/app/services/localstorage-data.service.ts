@@ -1,6 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
 import { DataService } from './data.service';
+import { Observable, of } from 'rxjs';
+import { AuthService } from './auth.service';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class LocalstorageDataService extends DataService {
@@ -13,7 +16,7 @@ export class LocalstorageDataService extends DataService {
     lastSync: 'mealdb_lastSync',
   };
 
-  constructor() {
+  constructor(private authService: AuthService) {
     super();
   }
 
@@ -141,5 +144,89 @@ export class LocalstorageDataService extends DataService {
     }
     
     return path;
+  }
+
+  fetchFavorites(): Observable<{ [key: string]: Recipe }> {
+    const user = this.authService.user.getValue();
+    if (!user) {
+      return of({});
+    }
+
+    const favoritesKey = `favorites_${user.id}`;
+    const storedFavorites = localStorage.getItem(favoritesKey);
+    
+    try {
+      if (storedFavorites) {
+        return of(JSON.parse(storedFavorites));
+      }
+      return of({});
+    } catch (error) {
+      console.error('Error parsing favorites from localStorage:', error);
+      return of({});
+    }
+  }
+
+  storeFavoriteRecipe(recipe: Recipe): Observable<void> {
+    const user = this.authService.user.getValue();
+    if (!user) {
+      return of(undefined);
+    }
+
+    try {
+      const favoritesKey = `favorites_${user.id}`;
+      const storedFavorites = localStorage.getItem(favoritesKey);
+      let favorites: { [key: string]: Recipe } = {};
+      
+      if (storedFavorites) {
+        favorites = JSON.parse(storedFavorites);
+      }
+      
+      favorites[recipe.id] = recipe;
+      localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+      
+      return of(undefined);
+    } catch (error) {
+      console.error('Error storing favorite in localStorage:', error);
+      return of(undefined);
+    }
+  }
+
+  removeFavoriteRecipe(recipeId: string): Observable<void> {
+    const user = this.authService.user.getValue();
+    if (!user) {
+      return of(undefined);
+    }
+
+    try {
+      const favoritesKey = `favorites_${user.id}`;
+      const storedFavorites = localStorage.getItem(favoritesKey);
+      
+      if (storedFavorites) {
+        const favorites = JSON.parse(storedFavorites);
+        delete favorites[recipeId];
+        localStorage.setItem(favoritesKey, JSON.stringify(favorites));
+      }
+      
+      return of(undefined);
+    } catch (error) {
+      console.error('Error removing favorite from localStorage:', error);
+      return of(undefined);
+    }
+  }
+
+  clearAllFavorites(): Observable<void> {
+    const user = this.authService.user.getValue();
+    if (!user) {
+      return of(undefined);
+    }
+
+    try {
+      const favoritesKey = `favorites_${user.id}`;
+      localStorage.setItem(favoritesKey, JSON.stringify({}));
+      return of(undefined);
+    } catch (error) {
+      console.error('Error clearing all favorites from localStorage:', error);
+      return of(undefined);
+    }
   }
 }

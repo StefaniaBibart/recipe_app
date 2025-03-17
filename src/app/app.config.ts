@@ -7,6 +7,7 @@ import { DataService } from './services/data.service';
 import { FirebaseDataService } from './services/firebase-data.service';
 import { LocalstorageDataService } from './services/localstorage-data.service';
 import { DataProviderType, DataProviderService } from './services/data-provider.service';
+import { FavoriteSyncService } from './services/favorite-sync.service';
 
 const firebaseConfig = {
   databaseURL: "https://recipe-app-44ea7-default-rtdb.europe-west1.firebasedatabase.app",
@@ -16,7 +17,7 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 // Set which data provider to use
-const DATA_PROVIDER = DataProviderType.LOCALSTORAGE;
+const DATA_PROVIDER = DataProviderType.FIREBASE;
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     // Register both service implementations
     FirebaseDataService,
     LocalstorageDataService,
+    FavoriteSyncService,
     // Configure the DataProviderService
     {
       provide: DataProviderService,

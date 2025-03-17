@@ -1,10 +1,15 @@
 import { Injectable, signal } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
-import { getDatabase, ref, get, set, child } from 'firebase/database';
+import { getDatabase, ref, get, set, child, remove } from 'firebase/database';
 import { DataService } from './data.service';
+import { Observable, from, of } from 'rxjs';
+import { map, catchError, switchMap, take } from 'rxjs/operators';
+import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class FirebaseDataService extends DataService {
+  private baseUrl = 'https://recipe-app-44ea7-default-rtdb.europe-west1.firebasedatabase.app';
   private dbPath = 'mealdb/meals';
   private dbPaths = {
     categories: 'mealdb/categories',
@@ -14,7 +19,10 @@ export class FirebaseDataService extends DataService {
     lastSync: 'mealdb/lastSync',
   };
 
-  constructor() {
+  constructor(
+    private authService: AuthService,
+    private http: HttpClient
+  ) {
     super();
     this.loadRecipesFromFirebase();
   }
@@ -140,5 +148,90 @@ export class FirebaseDataService extends DataService {
       console.error('Error checking for stored data:', error);
       return false;
     }
+  }
+
+  fetchFavorites(): Observable<{ [key: string]: Recipe }> {
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) {
+          return of({});
+        }
+        
+        return this.http.get<{ [key: string]: Recipe }>(
+          `${this.baseUrl}/favorites/${user.id}.json?auth=${user.token}`
+        ).pipe(
+          map(recipes => recipes || {}),
+          catchError(error => {
+            console.error('Error fetching favorites:', error);
+            return of({});
+          })
+        );
+      })
+    );
+  }
+
+  storeFavoriteRecipe(recipe: Recipe): Observable<void> {
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) {
+          return of(undefined);
+        }
+        
+        return this.http.put(
+          `${this.baseUrl}/favorites/${user.id}/${recipe.id}.json?auth=${user.token}`,
+          recipe
+        ).pipe(
+          map(() => undefined),
+          catchError(error => {
+            console.error('Error storing favorite:', error);
+            return of(undefined);
+          })
+        );
+      })
+    );
+  }
+
+  removeFavoriteRecipe(recipeId: string): Observable<void> {
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) {
+          return of(undefined);
+        }
+        
+        return this.http.delete(
+          `${this.baseUrl}/favorites/${user.id}/${recipeId}.json?auth=${user.token}`
+        ).pipe(
+          map(() => undefined),
+          catchError(error => {
+            console.error('Error removing favorite:', error);
+            return of(undefined);
+          })
+        );
+      })
+    );
+  }
+
+  clearAllFavorites(): Observable<void> {
+    return this.authService.user.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) {
+          return of(undefined);
+        }
+        
+        return this.http.delete(
+          `${this.baseUrl}/favorites/${user.id}.json?auth=${user.token}`
+        ).pipe(
+          map(() => undefined),
+          catchError(error => {
+            console.error('Error clearing all favorites:', error);
+            return of(undefined);
+          })
+        );
+      })
+    );
   }
 }

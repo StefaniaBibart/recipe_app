@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export abstract class DataService {
@@ -20,6 +21,11 @@ export abstract class DataService {
     ingredients: number;
     meals: number;
   }>;
+  
+  abstract fetchFavorites(): Observable<{ [key: string]: Recipe }>;
+  abstract storeFavoriteRecipe(recipe: Recipe): Observable<void>;
+  abstract removeFavoriteRecipe(recipeId: string): Observable<void>;
+  abstract clearAllFavorites(): Observable<void>;
   
   protected extractIngredients(meal: any): { name: string; measure: string }[] {
     const ingredients: { name: string; measure: string }[] = [];

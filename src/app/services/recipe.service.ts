@@ -1,8 +1,9 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
-import { FavoritesService } from './favorites.service';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { DataService } from './data.service';
+import { DataProviderService } from './data-provider.service';
+import { FavoriteSyncService } from './favorite-sync.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,11 +29,18 @@ export class RecipeService {
 
   constructor(
     private dataService: DataService,
-    private favoritesService: FavoritesService
+    private dataProviderService: DataProviderService,
+    private favoriteSyncService: FavoriteSyncService
   ) {
     this.loadRecipes();
     this.initializeFavorites();
     this.checkAndRefreshIfNeeded();
+    
+    this.dataProviderService.providerChanged$.subscribe(async (provider) => {
+      console.log(`Data provider changed to ${provider}, syncing favorites...`);
+      await this.favoriteSyncService.syncFavorites();
+      this.initializeFavorites();
+    });
   }
 
   private async loadRecipes() {
@@ -59,16 +67,23 @@ export class RecipeService {
   }
 
   private initializeFavorites() {
-    const favoritesObs = this.favoritesService.fetchFavorites();
-    if (favoritesObs) {
-      favoritesObs.subscribe({
-        next: (favorites) => {
+    const favoritesObs = this.dataService.fetchFavorites();
+    favoritesObs.subscribe({
+      next: (favorites) => {
+        if (favorites) {
           this.favoritesSubject.next(favorites);
           this.favorites.set(favorites);
-        },
-        error: (error) => console.error('Error loading favorites:', error)
-      });
-    }
+        } else {
+          this.favoritesSubject.next({});
+          this.favorites.set({});
+        }
+      },
+      error: (error) => {
+        console.error('Error loading favorites:', error);
+        this.favoritesSubject.next({});
+        this.favorites.set({});
+      }
+    });
   }
 
   currentRecipe() {
@@ -180,20 +195,25 @@ export class RecipeService {
 
   toggleFavorite(recipe: Recipe) {
     if (this.isFavorite(recipe.id)) {
-      const removeObs = this.favoritesService.removeFavoriteRecipe(recipe.id);
-      if (removeObs) {
-        removeObs.subscribe(() => {
+      const removeObs = this.dataService.removeFavoriteRecipe(recipe.id);
+      removeObs.subscribe({
+        next: () => {
           const newFavs = { ...this.favorites() };
           delete newFavs[recipe.id];
           this.favoritesSubject.next(newFavs);
           this.favorites.set(newFavs);
           this.favoriteRemovedSubject.next(recipe.id);
-        });
-      }
+          
+          this.favoriteSyncService.markAsDeleted(recipe.id);
+        },
+        error: (error) => {
+          console.error('Error removing favorite:', error);
+        }
+      });
     } else {
-      const storeObs = this.favoritesService.storeFavoriteRecipe(recipe);
-      if (storeObs) {
-        storeObs.subscribe(() => {
+      const storeObs = this.dataService.storeFavoriteRecipe(recipe);
+      storeObs.subscribe({
+        next: () => {
           const newFavs = {
             ...this.favorites(),
             [recipe.id]: recipe
@@ -201,8 +221,11 @@ export class RecipeService {
           this.favoritesSubject.next(newFavs);
           this.favorites.set(newFavs);
           this.favoriteAddedSubject.next(recipe);
-        });
-      }
+        },
+        error: (error) => {
+          console.error('Error adding favorite:', error);
+        }
+      });
     }
   }
 
@@ -211,7 +234,7 @@ export class RecipeService {
   }
 
   getFavorites() {
-    return this.favoritesService.fetchFavorites();
+    return this.dataService.fetchFavorites();
   }
 
   async checkAndRefreshIfNeeded() {
