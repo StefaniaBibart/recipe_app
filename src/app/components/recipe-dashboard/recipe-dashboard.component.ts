@@ -3,21 +3,22 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
-import { RecipeDataService } from '../../services/recipe-data.service';
+import { DataService } from '../../services/data.service';
 import { MultiselectComponent } from '../multiselect/multiselect.component';
 import { SelectComponent } from '../select/select.component';
 import { RecipeCardComponent } from '../recipe-card/recipe-card.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-recipe-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, MultiselectComponent, SelectComponent, RecipeCardComponent],
+  imports: [CommonModule, FormsModule, MultiselectComponent, SelectComponent, RecipeCardComponent, RouterLink],
   templateUrl: './recipe-dashboard.component.html',
   styleUrls: ['./recipe-dashboard.component.css']
 })
 export class RecipeDashboardComponent implements OnInit {
   private recipeService = inject(RecipeService);
-  public recipeDataService = inject(RecipeDataService);
+  public dataService = inject(DataService);
   
   selectedCategory = signal<string>('');
   selectedArea = signal<string>('');
@@ -25,19 +26,20 @@ export class RecipeDashboardComponent implements OnInit {
   searchTerm = signal<string>('');
   currentPage = signal<number>(1);
   itemsPerPage = 25;
+  hasData = signal<boolean>(false);
   
   categories = computed(() => {
-    const recipes = this.recipeDataService.recipes();
+    const recipes = this.dataService.recipes();
     return [...new Set(recipes.map((r: Recipe) => r.category))].sort();
   });
 
   areas = computed(() => {
-    const recipes = this.recipeDataService.recipes();
+    const recipes = this.dataService.recipes();
     return [...new Set(recipes.map((r: Recipe) => r.area))].sort();
   });
 
   ingredients = computed(() => {
-    const recipes = this.recipeDataService.recipes();
+    const recipes = this.dataService.recipes();
     const allIngredients = recipes.flatMap(recipe => 
       recipe.ingredients.map(ing => ing.name.toLowerCase())
     );
@@ -45,7 +47,7 @@ export class RecipeDashboardComponent implements OnInit {
   });
 
   filteredRecipes = computed(() => {
-    const recipes = this.recipeDataService.recipes();
+    const recipes = this.dataService.recipes();
     return recipes.filter((recipe: Recipe) => {
       const categoryMatch = !this.selectedCategory() || recipe.category === this.selectedCategory();
       const areaMatch = !this.selectedArea() || recipe.area === this.selectedArea();
@@ -103,7 +105,10 @@ export class RecipeDashboardComponent implements OnInit {
   selectedRecipeId = signal<string>('');
   showModal = signal(false);
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Check if data is available
+    this.hasData.set(await this.dataService.hasStoredData());
+    
     if (!this.recipeService.currentRecipe()) {
       this.recipeService.searchRecipes();
     }

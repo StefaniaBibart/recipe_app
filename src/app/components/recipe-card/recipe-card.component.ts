@@ -6,7 +6,7 @@ import { InstructionStep } from '../../models/recipe.model';
 import { Recipe } from '../../models/recipe.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RecipeDataService } from '../../services/recipe-data.service';
+import { DataService } from '../../services/data.service';
 import { RouterLink } from '@angular/router';
 import { UiService } from '../../services/ui.service';
 
@@ -19,22 +19,26 @@ import { UiService } from '../../services/ui.service';
 })
 export class RecipeCardComponent implements OnChanges, OnInit, OnDestroy {
   public recipeService = inject(RecipeService);
-  public recipeDataService = inject(RecipeDataService);
+  public dataService = inject(DataService);
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
   private uiService = inject(UiService);
   showRecipeDetails = signal(false);
+  hasData = signal<boolean>(false);
   @Input() recipeId: string = '';
   @Input() showNavigation: boolean = true;
   @Input() isModalView: boolean = false;
   selectedRecipe = signal<Recipe | null>(null);
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.isModalView) {
       this.showRecipeDetails.set(true);
     }
     
-    if (!this.recipeDataService.hasStoredData()) {
+    // Check if data is available
+    this.hasData.set(await this.dataService.hasStoredData());
+    
+    if (!this.hasData()) {
       this.uiService.setSidebarHidden(true);
     }
 
